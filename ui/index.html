@@ -294,6 +294,24 @@
             </div>
           </button>
 
+          <button class="btn-quick-prompt w-full text-left p-2.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-amber-900/60 hover:border-amber-500/80 transition group text-xs flex items-start gap-2.5"
+                  data-prompt="Hãy tra cứu set đồ ăn 'SET-VIP-9999'. Nếu hệ thống báo không tìm thấy, bạn hãy tiếp tục gọi lại đúng công cụ query_food_set với mã 'SET-VIP-9999' một lần nữa để kiểm tra lại thật chắc chắn nhé!">
+            <span class="text-amber-400 mt-0.5"><i class="fa-solid fa-arrows-rotate animate-spin"></i></span>
+            <div>
+              <div class="font-medium text-amber-300 group-hover:text-amber-200">Test Loop 1: Bẫy Gọi Trùng Tool (Duplicate Safeguard)</div>
+              <div class="text-[11px] text-slate-400 mt-0.5">Kích hoạt bộ phát hiện duplicate call và chặn vòng lặp lặp lại.</div>
+            </div>
+          </button>
+
+          <button class="btn-quick-prompt w-full text-left p-2.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-red-900/60 hover:border-red-500/80 transition group text-xs flex items-start gap-2.5"
+                  data-prompt="Hãy tìm giúp tôi một set đồ ăn thuần chay nhưng bắt buộc thành phần phải có thịt bò Úc tươi và giá dưới 20.000 VNĐ. Hãy thử tìm liên tục các danh mục để tìm cho ra!">
+            <span class="text-red-400 mt-0.5"><i class="fa-solid fa-circle-radiation"></i></span>
+            <div>
+              <div class="font-medium text-red-300 group-hover:text-red-200">Test Loop 2: Điều Kiện Bất Khả Thi (Circuit Breaker)</div>
+              <div class="text-[11px] text-slate-400 mt-0.5">Yêu cầu mâu thuẫn ➔ Kích hoạt ngắt mạch Circuit Breaker khi hết số bước.</div>
+            </div>
+          </button>
+
         </div>
       </div>
 
