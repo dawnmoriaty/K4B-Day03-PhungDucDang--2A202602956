@@ -122,20 +122,28 @@
     <!-- ================= LEFT COLUMN: CONTROL & METRICS (5 COLS) ================= -->
     <div class="lg:col-span-5 flex flex-col gap-4">
       
-      <!-- 1. LOOP CONTROLLER (MAX ITERATIONS SAFEGUARD) -->
+      <!-- 1. LOOP CONTROLLER (MAX ITERATIONS SAFEGUARD WITH +/- BUTTONS) -->
       <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-sm">
         <div class="flex items-center justify-between mb-2">
           <div class="flex items-center gap-2">
             <i class="fa-solid fa-repeat text-emerald-400"></i>
             <h2 class="text-sm font-semibold text-slate-200">Loop Controller (Max Iterations)</h2>
           </div>
-          <span id="loop-count-badge" class="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-emerald-950 text-emerald-400 border border-emerald-700">
-            7 vòng lặp
-          </span>
+          <div class="flex items-center gap-1.5">
+            <button id="btn-loop-minus" class="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs flex items-center justify-center border border-slate-700 transition active:scale-95" title="Giảm 1 bước">
+              <i class="fa-solid fa-minus text-[11px]"></i>
+            </button>
+            <span id="loop-count-badge" class="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-emerald-950 text-emerald-400 border border-emerald-700 min-w-[5.2rem] text-center shadow-inner">
+              7 vòng lặp
+            </span>
+            <button id="btn-loop-plus" class="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs flex items-center justify-center border border-slate-700 transition active:scale-95" title="Tăng 1 bước">
+              <i class="fa-solid fa-plus text-[11px]"></i>
+            </button>
+          </div>
         </div>
         
         <p class="text-xs text-slate-400 mb-3">
-          Safeguard giới hạn số bước suy luận tối đa để tránh Agent rơi vào vòng lặp vô hạn.
+          Safeguard giới hạn số bước suy luận tối đa. Bấm <strong>[-]</strong> hoặc <strong>[+]</strong> để tăng giảm từng bước chính xác.
         </p>
 
         <div class="flex items-center gap-3">
@@ -151,7 +159,7 @@
         </div>
       </div>
 
-      <!-- 2. TOKEN & COST CALCULATOR -->
+      <!-- 2. TOKEN & COST CALCULATOR (BÓC TÁCH CHI TIẾT) -->
       <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-sm">
         <div class="flex items-center justify-between mb-3">
           <div class="flex items-center gap-2">
@@ -182,7 +190,7 @@
 
           <div class="bg-slate-950/80 p-2.5 rounded-lg border border-slate-800/80">
             <div class="text-[11px] text-slate-400 flex items-center justify-between">
-              <span>Chi Phí USD:</span>
+              <span>Tổng Chi Phí USD:</span>
               <i class="fa-solid fa-dollar-sign text-emerald-400"></i>
             </div>
             <div id="metric-cost-usd" class="text-lg font-bold font-mono text-emerald-400 mt-0.5">$0.00000</div>
@@ -191,7 +199,7 @@
 
           <div class="bg-slate-950/80 p-2.5 rounded-lg border border-slate-800/80">
             <div class="text-[11px] text-slate-400 flex items-center justify-between">
-              <span>Chi Phí VNĐ:</span>
+              <span>Tổng Chi Phí VNĐ:</span>
               <i class="fa-solid fa-dong-sign text-amber-400"></i>
             </div>
             <div id="metric-cost-vnd" class="text-lg font-bold font-mono text-amber-400 mt-0.5">0.00 đ</div>
@@ -221,7 +229,7 @@
           <span class="text-[11px] text-slate-400">Bấm 1-click</span>
         </div>
 
-        <div class="space-y-1.5 flex-1 overflow-y-auto max-h-72 pr-1">
+        <div class="space-y-1.5 flex-1 overflow-y-auto max-h-64 pr-1">
           
           <button class="btn-quick-prompt w-full text-left p-2.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800/80 hover:border-emerald-700/60 transition group text-xs flex items-start gap-2.5"
                   data-prompt="Chào bạn, quán của mình có những loại set ăn nào và chính sách giao hàng ra sao?">
@@ -232,7 +240,7 @@
             </div>
           </button>
 
-          <button class="btn-quick-prompt w-full text-left p-2.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800/80 hover:border-emerald-700/60 transition group text-xs flex items-start gap-2.5"
+          <button class="btn-quick-prompt w-full text-left p-2.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800/80 hover:border-teal-700/60 transition group text-xs flex items-start gap-2.5"
                   data-prompt="Cho tôi tra cứu thông tin chi tiết và thành phần dinh dưỡng của set 'SET-CLEAN-01'.">
             <span class="text-teal-400 mt-0.5"><i class="fa-solid fa-magnifying-glass"></i></span>
             <div>
@@ -259,21 +267,21 @@
             </div>
           </button>
 
-          <button class="btn-quick-prompt w-full text-left p-2.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800/80 hover:border-red-700/60 transition group text-xs flex items-start gap-2.5"
-                  data-prompt="Tra cứu giúp tôi set ăn có mã 'SET-VIP-9999'.">
-            <span class="text-red-400 mt-0.5"><i class="fa-solid fa-circle-xmark"></i></span>
-            <div>
-              <div class="font-medium text-slate-200 group-hover:text-red-300">TC05: Set không tồn tại (Not Found Handling)</div>
-              <div class="text-[11px] text-slate-400 mt-0.5">Kiểm thử khả năng xử lý ngoại lệ khi tra cứu món không có.</div>
-            </div>
-          </button>
-
           <button class="btn-quick-prompt w-full text-left p-2.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800/80 hover:border-indigo-700/60 transition group text-xs flex items-start gap-2.5"
                   data-prompt="Tôi nặng 72kg, tập gym 4 buổi/tuần muốn tăng cơ giảm mỡ. Hãy tính khẩu phần và gợi ý ít nhất 3 set phù hợp!">
             <span class="text-indigo-400 mt-0.5"><i class="fa-solid fa-dumbbell"></i></span>
             <div>
               <div class="font-medium text-slate-200 group-hover:text-indigo-300">Case Gym: Tính định lượng calo & đạm</div>
               <div class="text-[11px] text-slate-400 mt-0.5">Kích hoạt tool calculate_diet_portion và query_food_set.</div>
+            </div>
+          </button>
+
+          <button class="btn-quick-prompt w-full text-left p-2.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800/80 hover:border-purple-700/60 transition group text-xs flex items-start gap-2.5"
+                  data-prompt="Tôi 70kg muốn giảm mỡ, bị dị ứng hải sản và muốn giao hàng lúc 12:00 trưa. Hãy tư vấn và tính calo cho tôi!">
+            <span class="text-purple-400 mt-0.5"><i class="fa-solid fa-bolt"></i></span>
+            <div>
+              <div class="font-medium text-slate-200 group-hover:text-purple-300">Case Đa Thông Tin: Song Song (T1) ➔ Tuần Tự (T2)</div>
+              <div class="text-[11px] text-slate-400 mt-0.5">Kích hoạt cả 3 tool Tầng 1 song song rồi chuyển sang Tầng 2.</div>
             </div>
           </button>
 
@@ -291,11 +299,142 @@
 
     </div>
 
-    <!-- ================= RIGHT COLUMN: OBSERVABILITY STREAM & CHAT (7 COLS) ================= -->
+    <!-- ================= RIGHT COLUMN: BPMN ARCHIFY GRAPH & WATERFALL STREAM (7 COLS) ================= -->
     <div class="lg:col-span-7 flex flex-col gap-4">
       
-      <!-- 1. WATERFALL TRACE STREAM PANEL -->
-      <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-sm flex-1 flex flex-col min-h-[480px]">
+      <!-- 1. BPMN / ARCHIFY INTERACTIVE PIPELINE NODE GRAPH (PHÁT SÁNG THEO BƯỚC GỌI) -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-sm">
+        <div class="flex items-center justify-between mb-2.5">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-diagram-project text-teal-400"></i>
+            <h2 class="text-sm font-semibold text-slate-200">Sơ Đồ Phân Cấp BPMN / Archify (Song Song vs Tuần Tự)</h2>
+          </div>
+          <div class="flex items-center gap-2 text-[10px]">
+            <span class="flex items-center gap-1 text-emerald-400 font-medium">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>Active Glow</span>
+            </span>
+            <span class="text-slate-600">|</span>
+            <span class="text-slate-400">⚡ Cùng cấp = Song song • ➔ Khác cấp = Tuần tự</span>
+          </div>
+        </div>
+
+        <!-- Visual DAG Flowchart -->
+        <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800/80 space-y-2.5">
+          
+          <!-- TIER 1: PARALLEL EXECUTION NODES (INDEPENDENT DATA) -->
+          <div>
+            <div class="flex items-center justify-between text-[10px] font-semibold text-emerald-400 mb-1.5 px-1">
+              <span class="flex items-center gap-1.5">
+                <i class="fa-solid fa-bolt text-amber-400"></i>
+                <span>TẦNG 1: ĐỘC LẬP (GỌI SONG SONG / PARALLEL)</span>
+              </span>
+              <span class="text-[9px] text-slate-400 font-normal">Không phụ thuộc dữ liệu ➔ Có thể chạy đồng thời</span>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <!-- Node 1: calculate_diet_portion -->
+              <div id="bpmn-node-calculate_diet_portion" class="bpmn-node p-2 rounded-lg border border-slate-800 bg-slate-900/60 transition-all duration-300 relative overflow-hidden group">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-[10px] font-mono font-bold text-slate-400 group-hover:text-emerald-300">#TOOL-1</span>
+                  <span class="node-status-badge text-[9px] font-semibold px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">Chờ gọi</span>
+                </div>
+                <div class="font-bold text-xs text-slate-200 flex items-center gap-1.5">
+                  <i class="fa-solid fa-calculator text-blue-400 text-[11px]"></i>
+                  <span class="truncate">calculate_diet_portion</span>
+                </div>
+                <div class="text-[10px] text-slate-400 mt-0.5 truncate">Tính calo & macros theo thể trạng</div>
+                <div class="mt-1.5 pt-1 border-t border-slate-800/80 flex justify-between items-center text-[10px] font-mono text-slate-400">
+                  <span class="node-latency">0 ms</span>
+                  <span class="node-cost text-amber-400 font-semibold">0.00 đ</span>
+                </div>
+              </div>
+
+              <!-- Node 2: check_allergy -->
+              <div id="bpmn-node-check_allergy" class="bpmn-node p-2 rounded-lg border border-slate-800 bg-slate-900/60 transition-all duration-300 relative overflow-hidden group">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-[10px] font-mono font-bold text-slate-400 group-hover:text-emerald-300">#TOOL-2</span>
+                  <span class="node-status-badge text-[9px] font-semibold px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">Chờ gọi</span>
+                </div>
+                <div class="font-bold text-xs text-slate-200 flex items-center gap-1.5">
+                  <i class="fa-solid fa-shield-virus text-amber-400 text-[11px]"></i>
+                  <span class="truncate">check_allergy</span>
+                </div>
+                <div class="text-[10px] text-slate-400 mt-0.5 truncate">Lọc dị ứng & set đồ an toàn</div>
+                <div class="mt-1.5 pt-1 border-t border-slate-800/80 flex justify-between items-center text-[10px] font-mono text-slate-400">
+                  <span class="node-latency">0 ms</span>
+                  <span class="node-cost text-amber-400 font-semibold">0.00 đ</span>
+                </div>
+              </div>
+
+              <!-- Node 3: check_voucher -->
+              <div id="bpmn-node-check_voucher" class="bpmn-node p-2 rounded-lg border border-slate-800 bg-slate-900/60 transition-all duration-300 relative overflow-hidden group">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-[10px] font-mono font-bold text-slate-400 group-hover:text-emerald-300">#TOOL-3</span>
+                  <span class="node-status-badge text-[9px] font-semibold px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">Chờ gọi</span>
+                </div>
+                <div class="font-bold text-xs text-slate-200 flex items-center gap-1.5">
+                  <i class="fa-solid fa-tags text-teal-400 text-[11px]"></i>
+                  <span class="truncate">check_voucher</span>
+                </div>
+                <div class="text-[10px] text-slate-400 mt-0.5 truncate">Tra cứu ưu đãi giờ vàng</div>
+                <div class="mt-1.5 pt-1 border-t border-slate-800/80 flex justify-between items-center text-[10px] font-mono text-slate-400">
+                  <span class="node-latency">0 ms</span>
+                  <span class="node-cost text-amber-400 font-semibold">0.00 đ</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CONNECTING ARROWS -->
+          <div class="flex items-center justify-center gap-2 text-slate-600 text-xs py-0.5">
+            <i class="fa-solid fa-arrow-down-long text-emerald-500 animate-bounce"></i>
+            <span class="text-[10px] font-mono text-slate-400">Phụ thuộc kết quả Tầng 1 ➔ Chạy Tuần Tự (Sequential)</span>
+            <i class="fa-solid fa-arrow-down-long text-emerald-500 animate-bounce"></i>
+          </div>
+
+          <!-- TIER 2 & TIER 3: SEQUENTIAL EXECUTION NODES -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <!-- Node 4: query_food_set (Tier 2) -->
+            <div id="bpmn-node-query_food_set" class="bpmn-node p-2 rounded-lg border border-slate-800 bg-slate-900/60 transition-all duration-300 relative overflow-hidden group">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[10px] font-mono font-bold text-teal-400">➔ TẦNG 2: TUẦN TỰ</span>
+                <span class="node-status-badge text-[9px] font-semibold px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">Chờ gọi</span>
+              </div>
+              <div class="font-bold text-xs text-slate-200 flex items-center gap-1.5">
+                <i class="fa-solid fa-utensils text-emerald-400 text-[11px]"></i>
+                <span class="truncate">query_food_set</span>
+              </div>
+              <div class="text-[10px] text-slate-400 mt-0.5 truncate">Lọc món an toàn & chuẩn calo sau T1</div>
+              <div class="mt-1.5 pt-1 border-t border-slate-800/80 flex justify-between items-center text-[10px] font-mono text-slate-400">
+                <span class="node-latency">0 ms</span>
+                <span class="node-cost text-amber-400 font-semibold">0.00 đ</span>
+              </div>
+            </div>
+
+            <!-- Node 5: order_food_set (Tier 3) -->
+            <div id="bpmn-node-order_food_set" class="bpmn-node p-2 rounded-lg border border-slate-800 bg-slate-900/60 transition-all duration-300 relative overflow-hidden group">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[10px] font-mono font-bold text-purple-400">➔ TẦNG 3: CHỐT ĐƠN</span>
+                <span class="node-status-badge text-[9px] font-semibold px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">Chờ gọi</span>
+              </div>
+              <div class="font-bold text-xs text-slate-200 flex items-center gap-1.5">
+                <i class="fa-solid fa-bag-shopping text-purple-400 text-[11px]"></i>
+                <span class="truncate">order_food_set</span>
+              </div>
+              <div class="text-[10px] text-slate-400 mt-0.5 truncate">Tạo đơn hàng & tính tổng tiền đã trừ voucher</div>
+              <div class="mt-1.5 pt-1 border-t border-slate-800/80 flex justify-between items-center text-[10px] font-mono text-slate-400">
+                <span class="node-latency">0 ms</span>
+                <span class="node-cost text-amber-400 font-semibold">0.00 đ</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 2. WATERFALL TRACE STREAM PANEL -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-sm flex-1 flex flex-col min-h-[440px]">
         
         <!-- Stream Header -->
         <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
@@ -313,7 +452,7 @@
         </div>
 
         <!-- Trace Items Container (Scrollable) -->
-        <div id="trace-container" class="flex-1 overflow-y-auto space-y-4 pr-2 max-h-[500px]">
+        <div id="trace-container" class="flex-1 overflow-y-auto space-y-4 pr-2 max-h-[460px]">
           
           <!-- Empty State -->
           <div id="empty-state" class="h-full flex flex-col items-center justify-center text-center p-8 text-slate-500">
@@ -322,7 +461,7 @@
             </div>
             <h3 class="text-sm font-medium text-slate-400">Chưa có sự kiện Trace nào</h3>
             <p class="text-xs text-slate-500 max-w-sm mt-1">
-              Chọn một Prompt gợi ý bên trái hoặc nhập yêu cầu phía dưới để quan sát chuỗi suy luận <span class="text-emerald-400">Thought ➔ Action ➔ Observation</span> theo thời gian thực.
+              Chọn một Prompt gợi ý bên trái hoặc nhập yêu cầu phía dưới để quan sát sơ đồ BPMN sáng đèn và chuỗi suy luận <span class="text-emerald-400">Thought ➔ Action ➔ Observation</span> theo thời gian thực.
             </p>
           </div>
 
@@ -346,7 +485,7 @@
 
       </div>
 
-      <!-- 2. INTERACTIVE CHAT INPUT BAR -->
+      <!-- 3. INTERACTIVE CHAT INPUT BAR -->
       <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 shadow-sm">
         <form id="chat-form" class="flex gap-2 items-end">
           <div class="flex-1 relative">
@@ -426,6 +565,9 @@
     const sliderMaxIterations = document.getElementById('slider-max-iterations');
     const loopCountBadge = document.getElementById('loop-count-badge');
     const loopWarning = document.getElementById('loop-warning');
+    const btnLoopMinus = document.getElementById('btn-loop-minus');
+    const btnLoopPlus = document.getElementById('btn-loop-plus');
+
     const chatForm = document.getElementById('chat-form');
     const inputQuery = document.getElementById('input-query');
     const btnSend = document.getElementById('btn-send');
@@ -486,9 +628,10 @@
       modeReactBtn.className = 'px-3 py-1 rounded-md font-medium text-slate-400 hover:text-slate-200 transition';
     });
 
-    // 3. Slider Loop Control
-    sliderMaxIterations.addEventListener('input', (e) => {
-      maxIterations = parseInt(e.target.value);
+    // 3. Loop Control Logic: Slider & +/- Buttons
+    function updateLoopIterations(newVal) {
+      maxIterations = Math.max(1, Math.min(15, newVal));
+      sliderMaxIterations.value = maxIterations;
       loopCountBadge.textContent = `${maxIterations} vòng lặp`;
 
       if (maxIterations <= 2) {
@@ -498,9 +641,29 @@
       } else {
         loopWarning.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i> <span class="text-emerald-400">Cấu hình ${maxIterations} bước: Thích hợp cho ReAct Agent V2.</span>`;
       }
-    });
+    }
 
-    // 4. Quick Prompt Hint Buttons
+    btnLoopMinus.addEventListener('click', () => updateLoopIterations(maxIterations - 1));
+    btnLoopPlus.addEventListener('click', () => updateLoopIterations(maxIterations + 1));
+    sliderMaxIterations.addEventListener('input', (e) => updateLoopIterations(parseInt(e.target.value)));
+
+    // 4. Reset BPMN Nodes to Inactive State
+    function resetBpmnNodes() {
+      document.querySelectorAll('.bpmn-node').forEach(node => {
+        node.className = "bpmn-node p-2 rounded-lg border border-slate-800 bg-slate-900/60 transition-all duration-300 relative overflow-hidden group";
+        const badge = node.querySelector('.node-status-badge');
+        if (badge) {
+          badge.textContent = "Chờ gọi";
+          badge.className = "node-status-badge text-[9px] font-semibold px-1.5 py-0.5 rounded bg-slate-800 text-slate-400";
+        }
+        const latency = node.querySelector('.node-latency');
+        if (latency) latency.textContent = "0 ms";
+        const cost = node.querySelector('.node-cost');
+        if (cost) cost.textContent = "0.00 đ";
+      });
+    }
+
+    // 5. Quick Prompt Hint Buttons
     document.querySelectorAll('.btn-quick-prompt').forEach(btn => {
       btn.addEventListener('click', () => {
         const promptText = btn.getAttribute('data-prompt');
@@ -509,7 +672,7 @@
       });
     });
 
-    // 5. Send Chat Request
+    // 6. Send Chat Request
     chatForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const query = inputQuery.value.trim();
@@ -519,6 +682,9 @@
       btnSend.disabled = true;
       btnSendText.textContent = "Đang chạy...";
       btnSend.classList.add('animate-pulse');
+
+      // Reset BPMN visual
+      resetBpmnNodes();
 
       // Clear previous traces if any
       if (emptyState) emptyState.style.display = 'none';
@@ -531,7 +697,6 @@
       finalAnswerWrapper.classList.add('hidden');
 
       try {
-        const startTime = performance.now();
         const response = await fetch('/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -557,7 +722,7 @@
       }
     });
 
-    // 6. Render Trace Logs & Outputs
+    // 7. Render Trace Logs & Outputs with BPMN Glow & Step Costs
     function renderExecutionResult(data) {
       traceContainer.innerHTML = '';
       const logs = data.trace_logs || [];
@@ -586,6 +751,9 @@
         budgetBar.className = "bg-emerald-500 h-full transition-all duration-500";
       }
 
+      // Reset & Highlight BPMN Nodes
+      resetBpmnNodes();
+
       // Render Each Step in Timeline
       if (logs.length === 0 && data.mode === 'baseline') {
         traceContainer.innerHTML = `
@@ -598,7 +766,31 @@
           </div>
         `;
       } else {
-        logs.forEach((log, idx) => {
+        logs.forEach((log) => {
+          // Highlight BPMN Node if tool call
+          if (log.action_type === 'TOOL_EXECUTION' && log.tool_name) {
+            const bpmnNode = document.getElementById(`bpmn-node-${log.tool_name}`);
+            if (bpmnNode) {
+              bpmnNode.className = "bpmn-node p-2 rounded-lg border-2 border-emerald-400 bg-emerald-950/80 shadow-lg shadow-emerald-500/30 ring-2 ring-emerald-500/50 scale-[1.02] transition-all duration-500 relative overflow-hidden group";
+              
+              const badge = bpmnNode.querySelector('.node-status-badge');
+              if (badge) {
+                badge.innerHTML = `<span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping mr-1"></span><span class="text-emerald-300 font-bold">ĐÃ GỌI (#${log.step})</span>`;
+                badge.className = "node-status-badge text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-900/90 text-emerald-200 border border-emerald-600";
+              }
+
+              const latencyEl = bpmnNode.querySelector('.node-latency');
+              if (latencyEl) {
+                latencyEl.innerHTML = `<i class="fa-regular fa-clock text-teal-400"></i> ${log.tool_latency_ms || log.latency_ms || 0}ms`;
+              }
+
+              const costEl = bpmnNode.querySelector('.node-cost');
+              if (costEl) {
+                costEl.innerHTML = `<i class="fa-solid fa-dong-sign text-amber-400"></i> ${log.cost?.vnd || 0}đ`;
+              }
+            }
+          }
+
           const stepDiv = document.createElement('div');
           stepDiv.className = "timeline-item relative pl-8 pb-4";
 
@@ -619,10 +811,21 @@
 
           let actionHtml = '';
           if (log.action_type === 'TOOL_EXECUTION') {
+            const hier = log.hierarchy || {};
+            const isParallel = hier.execution_mode === 'PARALLEL';
+            const tierBadgeHtml = `
+              <span class="px-1.5 py-0.5 rounded text-[9px] font-bold font-mono ${isParallel ? 'bg-amber-950 text-amber-300 border border-amber-800' : 'bg-teal-950 text-teal-300 border border-teal-800'}">
+                ${isParallel ? '⚡ SONG SONG (Tầng 1)' : '➔ TUẦN TỰ (' + (hier.tier_name || 'Tầng 2') + ')'}
+              </span>
+            `;
+
             actionHtml = `
               <div class="mt-2 bg-slate-950 rounded-lg p-2.5 border border-slate-800/80">
                 <div class="flex items-center justify-between text-[11px] mb-1">
-                  <span class="font-mono text-emerald-400 font-bold">🛠️ Action: ${log.tool_name}</span>
+                  <div class="flex items-center gap-2">
+                    <span class="font-mono text-emerald-400 font-bold">🛠️ Action: ${log.tool_name}</span>
+                    ${tierBadgeHtml}
+                  </div>
                   <span class="text-slate-500 text-[10px]">MCP Tool</span>
                 </div>
                 <pre class="text-[11px] font-mono text-slate-300 overflow-x-auto p-1 bg-slate-900/60 rounded"><code>${JSON.stringify(log.arguments || {}, null, 2)}</code></pre>
@@ -659,6 +862,32 @@
             `;
           }
 
+          // Step Granular Cost Card
+          const stepCostVnd = log.cost?.vnd || 0;
+          const stepCostUsd = log.cost?.usd || 0;
+          const cumVnd = log.cumulative_cost?.vnd || stepCostVnd;
+
+          const stepCostCardHtml = `
+            <div class="mt-2.5 grid grid-cols-2 sm:grid-cols-4 gap-1.5 bg-slate-900/90 p-2 rounded-lg border border-slate-800 text-[10px] font-mono">
+              <div>
+                <span class="text-slate-500">Chi phí bước này:</span>
+                <div class="font-bold text-amber-400">${stepCostVnd} đ <span class="text-[9px] text-slate-500">($${stepCostUsd.toFixed(6)})</span></div>
+              </div>
+              <div>
+                <span class="text-slate-500">Chi phí lũy kế:</span>
+                <div class="font-bold text-emerald-400">${cumVnd} đ</div>
+              </div>
+              <div>
+                <span class="text-slate-500">Tokens bước này:</span>
+                <div class="text-blue-300">P: ${log.usage?.prompt_tokens || 0} | C: ${log.usage?.completion_tokens || 0}</div>
+              </div>
+              <div>
+                <span class="text-slate-500">Thời gian xử lý:</span>
+                <div class="text-teal-300">LLM: ${log.llm_latency_ms || 0}ms | Tool: ${log.tool_latency_ms || 0}ms</div>
+              </div>
+            </div>
+          `;
+
           stepDiv.innerHTML = `
             <div class="timeline-line"></div>
             <!-- Node Icon -->
@@ -678,7 +907,7 @@
                 <div class="flex items-center gap-2 text-[10px] font-mono text-slate-400">
                   <span title="Thời gian trễ">${log.latency_ms || 0} ms</span>
                   <span>•</span>
-                  <span class="text-amber-400" title="Chi phí bước này">${log.cost?.vnd || 0} đ</span>
+                  <span class="text-amber-400 font-bold" title="Chi phí bước này">${stepCostVnd} đ</span>
                 </div>
               </div>
 
@@ -690,6 +919,7 @@
               ` : ''}
 
               ${actionHtml}
+              ${stepCostCardHtml}
               ${duplicateAlertHtml}
               ${circuitBreakerHtml}
             </div>
@@ -710,7 +940,7 @@
       }
     }
 
-    // 7. Clear Trace
+    // 8. Clear Trace
     btnClearTrace.addEventListener('click', () => {
       traceContainer.innerHTML = '';
       if (emptyState) traceContainer.appendChild(emptyState);
@@ -723,9 +953,10 @@
       budgetPercent.textContent = '0%';
       badgeTotalSteps.textContent = '0 bước';
       badgeTotalLatency.textContent = '0 ms';
+      resetBpmnNodes();
     });
 
-    // 8. Copy Final Answer
+    // 9. Copy Final Answer
     btnCopyAnswer.addEventListener('click', () => {
       const text = finalAnswerContent.innerText;
       navigator.clipboard.writeText(text).then(() => {
@@ -736,13 +967,13 @@
       });
     });
 
-    // 9. Reset Input
+    // 10. Reset Input
     btnResetInput.addEventListener('click', () => {
       inputQuery.value = '';
       inputQuery.focus();
     });
 
-    // 10. Modal Logic: Explore Menu & Vouchers
+    // 11. Modal Logic: Explore Menu & Vouchers
     btnOpenMenuModal.addEventListener('click', () => {
       menuModal.classList.remove('hidden');
       renderMenuCards('all');

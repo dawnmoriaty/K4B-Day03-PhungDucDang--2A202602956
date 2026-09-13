@@ -25,7 +25,7 @@ sys.path.insert(0, SRC_DIR)
 
 from mcp_server import MCPAcademicServer
 from providers import get_llm_provider
-from app import run_react_agent, run_baseline_chatbot, save_waterfall_trace, calculate_token_cost
+from app import run_react_agent, run_baseline_chatbot, save_waterfall_trace, calculate_token_cost, TOOL_HIERARCHY
 
 # Khởi tạo singleton server & provider
 print("🚀 Đang khởi tạo MCP Academic Server và LLM Provider...")
@@ -44,12 +44,15 @@ class AgentUIHandler(BaseHTTPRequestHandler):
         self.send_response(status_code)
         self.send_header("Content-Type", f"{content_type}; charset=utf-8")
         self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, HEAD")
         self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
         self.end_headers()
 
     def do_OPTIONS(self):
         self._set_headers(200, "text/plain")
+
+    def do_HEAD(self):
+        self._set_headers(200, "text/html")
 
     def do_GET(self):
         parsed = urlparse(self.path)
@@ -68,7 +71,7 @@ class AgentUIHandler(BaseHTTPRequestHandler):
                 self.wfile.write(b"UI file not found. Please ensure ui/index.html exists.")
             return
 
-        # 2. API: Lấy trạng thái hệ thống
+        # 2. API: Lấy trạng thái hệ thống & Cây phân cấp Tool
         if path == "/api/status":
             menu_file = os.path.join(DATA_DIR, "menu.json")
             voucher_file = os.path.join(DATA_DIR, "vouchers.json")
@@ -90,7 +93,8 @@ class AgentUIHandler(BaseHTTPRequestHandler):
                 "model_name": provider.model_name,
                 "total_menu_items": total_items,
                 "total_vouchers": total_vouchers,
-                "tools_available": [t["name"] for t in mcp_server.list_tools()]
+                "tools_available": [t["name"] for t in mcp_server.list_tools()],
+                "tool_hierarchy": TOOL_HIERARCHY
             }
             self._set_headers(200)
             self.wfile.write(json.dumps(data, ensure_ascii=False).encode("utf-8"))

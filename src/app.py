@@ -54,6 +54,64 @@ def save_waterfall_trace(trace_data: list):
     print(f"📊 [OBSERVABILITY]: Đã lưu {len(trace_data)} sự kiện Waterfall Trace tại '{trace_path}'!")
 
 
+TOOL_HIERARCHY = {
+    "calculate_diet_portion": {
+        "tier": 1,
+        "tier_name": "Tầng 1: Độc lập / Phân tích",
+        "execution_mode": "PARALLEL",
+        "can_parallel_with": ["check_allergy", "check_voucher"],
+        "depends_on": [],
+        "description": "Tính calo/macros độc lập theo thể trạng người dùng."
+    },
+    "check_allergy": {
+        "tier": 1,
+        "tier_name": "Tầng 1: Độc lập / An toàn",
+        "execution_mode": "PARALLEL",
+        "can_parallel_with": ["calculate_diet_portion", "check_voucher"],
+        "depends_on": [],
+        "description": "Kiểm tra dị ứng độc lập với thực đơn và giờ ăn."
+    },
+    "check_voucher": {
+        "tier": 1,
+        "tier_name": "Tầng 1: Độc lập / Khung giờ",
+        "execution_mode": "PARALLEL",
+        "can_parallel_with": ["calculate_diet_portion", "check_allergy"],
+        "depends_on": [],
+        "description": "Kiểm tra voucher giờ vàng độc lập theo thời gian nhận."
+    },
+    "query_food_set": {
+        "tier": 2,
+        "tier_name": "Tầng 2: Lọc dữ liệu / Thực đơn",
+        "execution_mode": "SEQUENTIAL",
+        "can_parallel_with": [],
+        "depends_on": ["check_allergy", "calculate_diet_portion"],
+        "description": "Bắt buộc chạy sau Tầng 1 để lọc danh sách an toàn và đúng mức calo."
+    },
+    "order_food_set": {
+        "tier": 3,
+        "tier_name": "Tầng 3: Chốt đơn / Giao dịch",
+        "execution_mode": "SEQUENTIAL",
+        "can_parallel_with": [],
+        "depends_on": ["query_food_set", "check_voucher"],
+        "description": "Bắt buộc chạy sau cùng khi đã chốt món ăn và áp mã giảm giá."
+    },
+    "academic_query": {
+        "tier": 1,
+        "tier_name": "Tầng 1: Tra cứu học vụ",
+        "execution_mode": "PARALLEL",
+        "can_parallel_with": [],
+        "depends_on": []
+    },
+    "schedule_appointment": {
+        "tier": 2,
+        "tier_name": "Tầng 2: Đặt lịch hẹn",
+        "execution_mode": "SEQUENTIAL",
+        "can_parallel_with": [],
+        "depends_on": ["academic_query"]
+    }
+}
+
+
 def calculate_token_cost(usage: dict) -> dict:
     """Tính toán chi phí gọi LLM theo biểu giá Gemini Flash / OpenAI ($0.075 input / $0.30 output per 1M tokens)"""
     p_tokens = usage.get("prompt_tokens", 0)
@@ -103,13 +161,17 @@ def run_react_agent(user_query: str, provider, mcp_server: MCPAcademicServer, ma
     [REACT AGENT LOOP V2 - PRODUCTION GRADE]
     Thực thi vòng lặp Thought -> Action -> Observation với MCP Server và Safeguards
     Bám sát chuẩn giáo trình VinUniversity AI Course (Slide Day 3)
-    Hỗ trợ tùy chỉnh số vòng lặp tối đa max_iterations và ghi nhận Token / Chi phí
+    Hỗ trợ phân tầng công cụ (Hierarchy: Parallel vs Sequential), đo chi phí bóc tách và lũy kế.
     """
     print(f"\n🤖 [REACT AGENT] Câu hỏi: {user_query} (Max Iterations: {max_iterations})")
     
     step = 0
     trace_logs = []
     tools_list = mcp_server.list_tools()
+    
+    # Biến lũy kế chi phí toàn phiên
+    cumulative_cost_usd = 0.0
+    cumulative_cost_vnd = 0.0
     
     # Trajectory Context tích lũy qua từng vòng lặp
     trajectory_context = f"Yêu cầu của khách hàng: {user_query}"
@@ -136,15 +198,23 @@ def run_react_agent(user_query: str, provider, mcp_server: MCPAcademicServer, ma
         if llm_response.get("type") == "text":
             final_content = llm_response.get("content", "")
             print(f"🏁 [Final Answer]:\n{final_content}")
+            cumulative_cost_usd += cost["usd"]
+            cumulative_cost_vnd += cost["vnd"]
             trace_logs.append({
                 "step": step,
                 "query": user_query,
                 "action_type": "FINAL_ANSWER",
                 "thought": thought,
                 "output": final_content,
+                "llm_latency_ms": latency_ms,
+                "tool_latency_ms": 0.0,
                 "latency_ms": latency_ms,
                 "usage": usage,
-                "cost": cost
+                "cost": cost,
+                "cumulative_cost": {
+                    "usd": round(cumulative_cost_usd, 7),
+                    "vnd": round(cumulative_cost_vnd, 2)
+                }
             })
             break
             
@@ -152,9 +222,18 @@ def run_react_agent(user_query: str, provider, mcp_server: MCPAcademicServer, ma
         elif llm_response.get("type") == "tool_call":
             tool_name = llm_response.get("tool_name")
             arguments = llm_response.get("arguments", {})
+            hierarchy = TOOL_HIERARCHY.get(tool_name, {
+                "tier": 1,
+                "tier_name": "Tầng 1: Độc lập",
+                "execution_mode": "PARALLEL",
+                "can_parallel_with": [],
+                "depends_on": [],
+                "description": "Thao tác tra cứu."
+            })
             
-            print(f"🛠️ [Action Proposed]: {tool_name}({json.dumps(arguments, ensure_ascii=False)})")
+            print(f"🛠️ [Action Proposed ({hierarchy['tier_name']} - {hierarchy['execution_mode']})]: {tool_name}({json.dumps(arguments, ensure_ascii=False)})")
             
+            tool_latency_ms = 0.0
             # SAFEGUARD 1: Phát hiện Agent đi vòng (Duplicate Tool Call)
             is_dup = is_duplicate_call(trace_logs, tool_name, arguments)
             if is_dup:
@@ -163,6 +242,7 @@ def run_react_agent(user_query: str, provider, mcp_server: MCPAcademicServer, ma
                 obs_data = {"status": "DUPLICATE_CALL_WARNING", "message": warning_msg}
             else:
                 # SAFEGUARD 2: Bắt lỗi Timeout & Exception khi gọi qua MCP Server
+                tool_start_time = time.time()
                 try:
                     mcp_result = mcp_server.call_tool(tool_name, arguments)
                     obs_data = mcp_result.get("result", {})
@@ -170,9 +250,13 @@ def run_react_agent(user_query: str, provider, mcp_server: MCPAcademicServer, ma
                     obs_data = {"status": "TIMEOUT_ERROR", "error": f"Tool {tool_name} timed out after 5s"}
                 except Exception as e:
                     obs_data = {"status": "EXECUTION_ERROR", "error": str(e)}
+                tool_latency_ms = round((time.time() - tool_start_time) * 1000, 2)
             
             obs_str = json.dumps(obs_data, ensure_ascii=False)
-            print(f"👁️ [Observation từ MCP Server]: {obs_str}")
+            print(f"👁️ [Observation từ MCP Server ({tool_latency_ms}ms)]: {obs_str}")
+            
+            cumulative_cost_usd += cost["usd"]
+            cumulative_cost_vnd += cost["vnd"]
             
             trace_logs.append({
                 "step": step,
@@ -181,9 +265,16 @@ def run_react_agent(user_query: str, provider, mcp_server: MCPAcademicServer, ma
                 "tool_name": tool_name,
                 "arguments": arguments,
                 "observation": obs_data,
-                "latency_ms": latency_ms,
+                "llm_latency_ms": latency_ms,
+                "tool_latency_ms": tool_latency_ms,
+                "latency_ms": round(latency_ms + tool_latency_ms, 2),
                 "usage": usage,
                 "cost": cost,
+                "cumulative_cost": {
+                    "usd": round(cumulative_cost_usd, 7),
+                    "vnd": round(cumulative_cost_vnd, 2)
+                },
+                "hierarchy": hierarchy,
                 "is_duplicate_blocked": is_dup
             })
             
@@ -206,9 +297,15 @@ def run_react_agent(user_query: str, provider, mcp_server: MCPAcademicServer, ma
                     "action_type": "FINAL_ANSWER",
                     "thought": "Đạt giới hạn vòng lặp tối đa. Dừng lại an toàn và đưa ra phản hồi tổng kết.",
                     "output": fallback_msg,
+                    "llm_latency_ms": 5.0,
+                    "tool_latency_ms": 0.0,
                     "latency_ms": 5.0,
                     "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0},
                     "cost": {"usd": 0.0, "vnd": 0.0},
+                    "cumulative_cost": {
+                        "usd": round(cumulative_cost_usd, 7),
+                        "vnd": round(cumulative_cost_vnd, 2)
+                    },
                     "circuit_breaker_triggered": True
                 })
                 break
