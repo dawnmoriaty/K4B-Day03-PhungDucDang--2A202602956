@@ -2,24 +2,257 @@
   {
     "step": 1,
     "query": "Chào bạn, quán của mình có những loại set ăn nào và chính sách giao hàng ra sao?",
-    "action_type": "FINAL_ANSWER",
-    "thought": "Câu hỏi chung về thực đơn và chính sách của quán, trả lời trực tiếp từ System Prompt mà không cần gọi Tool.",
-    "output": "[Healthy Food Assistant]: Chào bạn! Quán chúng mình chuyên cung cấp các set ăn lành mạnh gồm: Eat Clean (giảm mỡ), Thuần chay (dưỡng sinh), Bò Úc (tăng cơ) và Keto. Quán có giao hàng tận nơi từ 07:00 đến 21:30 hàng ngày với nhiều voucher giờ vàng hấp dẫn!",
-    "llm_latency_ms": 2516.01,
-    "tool_latency_ms": 0.0,
-    "latency_ms": 2516.01,
+    "action_type": "TOOL_EXECUTION",
+    "tool_name": "query_food_set",
+    "arguments": {
+      "category": "all",
+      "min_items": 3
+    },
+    "observation": {
+      "status": "SUCCESS",
+      "total_results": 21,
+      "recommended_meals": [
+        {
+          "set_code": "SET-CLEAN-01",
+          "name": "Set Eat Clean Ức Gà Nướng Thảo Mộc Quinoa",
+          "category": "Eat Clean / Giảm cân",
+          "price": "75,000 VNĐ",
+          "price_raw": 75000,
+          "calories": "480 kcal",
+          "allergen_warning": "Không chứa hải sản. Không sữa. Rất ít dầu mỡ, tối ưu đốt mỡ và giảm cân."
+        },
+        {
+          "set_code": "SET-CLEAN-02",
+          "name": "Set Cá Hồi Nauy Áp Chảo Sốt Chanh Leo & Gạo Lứt",
+          "category": "Eat Clean / Omega-3",
+          "price": "115,000 VNĐ",
+          "price_raw": 115000,
+          "calories": "530 kcal",
+          "allergen_warning": "CẢNH BÁO DỊ ỨNG: Chứa Cá hồi. Người có tiền sử dị ứng hải sản / cá biển cần lưu ý!"
+        },
+        {
+          "set_code": "SET-CLEAN-03",
+          "name": "Set Eat Clean Gà Xé Phay Trộn Rau Mầm & Khoai Lang Tím",
+          "category": "Eat Clean / Ít Calo",
+          "price": "70,000 VNĐ",
+          "price_raw": 70000,
+          "calories": "440 kcal",
+          "allergen_warning": "Không chứa hải sản. Không sữa. Rất thanh mát, giàu chất xơ hòa tan."
+        },
+        {
+          "set_code": "SET-CLEAN-04",
+          "name": "Set Cá Basa Phi Lê Nướng Tiêu Chanh & Salad Hy Lạp",
+          "category": "Eat Clean / Tiết Kiệm",
+          "price": "68,000 VNĐ",
+          "price_raw": 68000,
+          "calories": "460 kcal",
+          "allergen_warning": "CẢNH BÁO DỊ ỨNG: Chứa cá nước ngọt phi lê."
+        },
+        {
+          "set_code": "SET-VEGAN-01",
+          "name": "Set Chay Thanh Đạm Đậu Hũ Non Sốt Nấm Đùi Gà",
+          "category": "Thuần Chay / Vegan",
+          "price": "65,000 VNĐ",
+          "price_raw": 65000,
+          "calories": "420 kcal",
+          "allergen_warning": "Thuần thực vật 100%, không chứa sữa/trứng/hải sản/thịt động vật."
+        },
+        {
+          "set_code": "SET-VEGAN-02",
+          "name": "Set Chay Cà Tím Nướng Miso Nhật & Cơm Ngũ Hạt",
+          "category": "Thuần Chay / Dưỡng sinh",
+          "price": "70,000 VNĐ",
+          "price_raw": 70000,
+          "calories": "410 kcal",
+          "allergen_warning": "Không chứa hải sản. Chứa đậu nành trong sốt miso."
+        },
+        {
+          "set_code": "SET-VEGAN-03",
+          "name": "Set Chay Cà Rốt Củ Dền Hầm Đậu Đỏ & Nấm Đông Cô",
+          "category": "Thuần Chay / Bổ Máu",
+          "price": "62,000 VNĐ",
+          "price_raw": 62000,
+          "calories": "390 kcal",
+          "allergen_warning": "Thuần chay 100%. Không dầu mỡ, giàu sắt và khoáng chất tự nhiên."
+        },
+        {
+          "set_code": "SET-VEGAN-04",
+          "name": "Set Chay Bún Gạo Lứt Chả Nấm & Nem Rau Củ Chiên Không Dầu",
+          "category": "Thuần Chay / Đổi Vị",
+          "price": "68,000 VNĐ",
+          "price_raw": 68000,
+          "calories": "450 kcal",
+          "allergen_warning": "Thuần chay 100%. Không phẩm màu, không chất bảo quản."
+        },
+        {
+          "set_code": "SET-SEAFOOD-01",
+          "name": "Set Hải Sản Tôm Sú Áp Chảo Măng Tây & Khoai Lang Mật",
+          "category": "Hải sản Cao cấp",
+          "price": "95,000 VNĐ",
+          "price_raw": 95000,
+          "calories": "510 kcal",
+          "allergen_warning": "CẢNH BÁO DỊ ỨNG: Chứa Tôm sú (Hải sản). Người dị ứng hải sản TUYỆT ĐỐI KHÔNG DÙNG!"
+        },
+        {
+          "set_code": "SET-SEAFOOD-02",
+          "name": "Set Mực Ống Nướng Sa Tế Dầu Hào & Salad Cầu Vồng",
+          "category": "Hải sản / Đậm vị",
+          "price": "90,000 VNĐ",
+          "price_raw": 90000,
+          "calories": "490 kcal",
+          "allergen_warning": "CẢNH BÁO DỊ ỨNG: Chứa Mực ống (Hải sản). Người dị ứng hải sản TUYỆT ĐỐI KHÔNG DÙNG!"
+        },
+        {
+          "set_code": "SET-SEAFOOD-03",
+          "name": "Set Cơm Trộn Bát Bửu Sò Điệp Nhật & Tảo Biển Wakame",
+          "category": "Hải sản / Thượng Hạng",
+          "price": "120,000 VNĐ",
+          "price_raw": 120000,
+          "calories": "520 kcal",
+          "allergen_warning": "CẢNH BÁO DỊ ỨNG: Chứa Sò điệp, nhuyễn thể và hải sản. Người dị ứng TUYỆT ĐỐI KHÔNG DÙNG!"
+        },
+        {
+          "set_code": "SET-BEEF-01",
+          "name": "Set Thăn Bò Úc Áp Chảo Khoai Tây Nghiền & Đậu Cove",
+          "category": "Tăng cơ / Giàu Protein",
+          "price": "85,000 VNĐ",
+          "price_raw": 85000,
+          "calories": "560 kcal",
+          "allergen_warning": "Không chứa hải sản. Giàu sắt và protein cho người tập gym, tăng cơ bắp."
+        },
+        {
+          "set_code": "SET-BEEF-02",
+          "name": "Set Bò Hầm Tiêu Xanh Rượu Vang & Bánh Mì Nguyên Cám",
+          "category": "Tăng cơ / Đậm Đà",
+          "price": "92,000 VNĐ",
+          "price_raw": 92000,
+          "calories": "580 kcal",
+          "allergen_warning": "Không chứa hải sản. Chứa gluten trong bánh mì nguyên cám."
+        },
+        {
+          "set_code": "SET-KETO-01",
+          "name": "Set Keto Đùi Gà Rút Xương Nướng Phô Mai Mozzarella",
+          "category": "Keto / Low-Carb",
+          "price": "85,000 VNĐ",
+          "price_raw": 85000,
+          "calories": "620 kcal",
+          "allergen_warning": "Không chứa hải sản. CẢNH BÁO DỊ ỨNG: Chứa sản phẩm từ sữa và trứng."
+        },
+        {
+          "set_code": "SET-KETO-02",
+          "name": "Set Keto Ba Chỉ Xông Khói Trứng Chần & Bơ Quả Sáp",
+          "category": "Keto Siêu Giàu Béo Tốt",
+          "price": "90,000 VNĐ",
+          "price_raw": 90000,
+          "calories": "640 kcal",
+          "allergen_warning": "Không chứa hải sản. CẢNH BÁO DỊ ỨNG: Chứa trứng và hạt hạnh nhân."
+        },
+        {
+          "set_code": "SET-KETO-03",
+          "name": "Set Keto Bò Cuộn Nấm Kim Châm & Salad Dầu Giấm Hạnh Nhân",
+          "category": "Keto / Giàu Đạm",
+          "price": "95,000 VNĐ",
+          "price_raw": 95000,
+          "calories": "610 kcal",
+          "allergen_warning": "Không chứa hải sản. CẢNH BÁO DỊ ỨNG: Chứa hạt óc chó."
+        },
+        {
+          "set_code": "SET-BREAKFAST-01",
+          "name": "Set Bữa Sáng Bánh Mì Đen Quả Bơ & Trứng Ốp La Thảo Mộc",
+          "category": "Bữa Sáng / Healthy Breakfast",
+          "price": "48,000 VNĐ",
+          "price_raw": 48000,
+          "calories": "360 kcal",
+          "allergen_warning": "Không chứa hải sản. Chứa trứng gà và gluten lúa mì."
+        },
+        {
+          "set_code": "SET-BREAKFAST-02",
+          "name": "Set Yến Mạch Ngâm Sữa Hạt Hạnh Nhân & Việt Quất Tươi",
+          "category": "Bữa Sáng / Năng Lượng Sạch",
+          "price": "52,000 VNĐ",
+          "price_raw": 52000,
+          "calories": "340 kcal",
+          "allergen_warning": "Không chứa sữa bò, không lactose. Chứa hạnh nhân."
+        },
+        {
+          "set_code": "SET-SNACK-01",
+          "name": "Set Detox Nước Ép Cần Tây Táo Xanh & Sữa Chua Hy Lạp Hạt Chia",
+          "category": "Tráng miệng / Detox",
+          "price": "45,000 VNĐ",
+          "price_raw": 45000,
+          "calories": "190 kcal",
+          "allergen_warning": "Không chứa hải sản. Chứa sữa trong sữa chua Hy Lạp."
+        },
+        {
+          "set_code": "SET-SNACK-02",
+          "name": "Set Nước Ép Cam Cà Rốt Gừng & Bánh Quy Hạt Yến Mạch",
+          "category": "Tráng miệng / Tăng Đề Kháng",
+          "price": "40,000 VNĐ",
+          "price_raw": 40000,
+          "calories": "210 kcal",
+          "allergen_warning": "Thuần thực vật. Chứa gluten trong bánh quy yến mạch."
+        },
+        {
+          "set_code": "SET-FAMILY-01",
+          "name": "Combo Đại Gia Đình Healthy 4 Suất Thập Cẩm",
+          "category": "Set Gia Đình / Nhóm 4 Người",
+          "price": "290,000 VNĐ",
+          "price_raw": 290000,
+          "calories": "1950 kcal",
+          "allergen_warning": "Combo phong phú có món chứa cá. An toàn cho người kiêng tôm/mực/sò."
+        }
+      ]
+    },
+    "llm_latency_ms": 4592.32,
+    "tool_latency_ms": 3.82,
+    "latency_ms": 4596.14,
     "usage": {
-      "prompt_tokens": 26,
-      "completion_tokens": 63,
-      "total_tokens": 89
+      "prompt_tokens": 2279,
+      "completion_tokens": 24,
+      "total_tokens": 2622
     },
     "cost": {
-      "usd": 2.08e-05,
-      "vnd": 0.53
+      "usd": 0.0001781,
+      "vnd": 4.52
     },
     "cumulative_cost": {
-      "usd": 2.08e-05,
-      "vnd": 0.53
+      "usd": 0.0001781,
+      "vnd": 4.52
+    },
+    "hierarchy": {
+      "tier": 2,
+      "tier_name": "Tầng 2: Lọc dữ liệu / Thực đơn",
+      "execution_mode": "SEQUENTIAL",
+      "can_parallel_with": [],
+      "depends_on": [
+        "check_allergy",
+        "calculate_diet_portion"
+      ],
+      "description": "Bắt buộc chạy sau Tầng 1 để lọc danh sách an toàn và đúng mức calo."
+    },
+    "is_duplicate_blocked": false
+  },
+  {
+    "step": 2,
+    "query": "Chào bạn, quán của mình có những loại set ăn nào và chính sách giao hàng ra sao?",
+    "action_type": "FINAL_ANSWER",
+    "thought": "Gemini phản hồi trực tiếp bằng văn bản (không cần gọi công cụ).",
+    "output": "Chào bạn, **Quán Healthy Meal Agent** xin gửi tới bạn thông tin chi tiết về các dòng set ăn cùng chính sách giao hàng và ưu đãi hấp dẫn của quán như sau:\n\n---\n\n### 🥗 1. DANH SÁCH MÁY/SET ĐỒ ĂN DẠNG COMBO\n\nQuán cung cấp đa dạng các chế độ ăn phù hợp với mọi nhu cầu thể trạng:\n\n#### 🟢 **Dòng Eat Clean / Giảm Cân & Đốt Mỡ**\n* **SET-CLEAN-01**: Set Ức Gà Nướng Thảo Mộc Quinoa – **75,000 VNĐ** *(480 kcal)*\n* **SET-CLEAN-02**: Set Cá Hồi Nauy Áp Chảo Sốt Chanh Leo & Gạo Lứt – **115,000 VNĐ** *(530 kcal)*\n* **SET-CLEAN-03**: Set Gà Xé Phay Trộn Rau Mầm & Khoai Lang Tím – **70,000 VNĐ** *(440 kcal)*\n* **SET-CLEAN-04**: Set Cá Basa Phi Lê Nướng Tiêu Chanh & Salad Hy Lạp – **68,000 VNĐ** *(460 kcal)*\n\n#### 🌿 **Dòng Thuần Chay (Vegan)**\n* **SET-VEGAN-01**: Set Chay Đậu Hũ Non Sốt Nấm Đùi Gà – **65,000 VNĐ** *(420 kcal)*\n* **SET-VEGAN-02**: Set Chay Cà Tím Nướng Miso Nhật & Cơm Ngũ Hạt – **70,000 VNĐ** *(410 kcal)*\n* **SET-VEGAN-03**: Set Chay Cà Rốt Củ Dền Hầm Đậu Đỏ & Nấm Đông Cô – **62,000 VNĐ** *(390 kcal)*\n* **SET-VEGAN-04**: Set Chay Bún Gạo Lứt Chả Nấm & Nem Rau Củ Chiên Không Dầu – **68,000 VNĐ** *(450 kcal)*\n\n#### 🥩 **Dòng Tăng Cơ / Gym & Giàu Protein**\n* **SET-BEEF-01**: Set Thăn Bò Úc Áp Chảo Khoai Tây Nghiền & Đậu Cove – **85,000 VNĐ** *(560 kcal)*\n* **SET-BEEF-02**: Set Bò Hầm Tiêu Xanh Rượu Vang & Bánh Mì Nguyên Cám – **92,000 VNĐ** *(580 kcal)*\n\n#### 🦐 **Dòng Hải Sản Cao Cấp**\n* **SET-SEAFOOD-01**: Set Tôm Sú Áp Chảo Măng Tây & Khoai Lang Mật – **95,000 VNĐ** *(510 kcal)*\n* **SET-SEAFOOD-02**: Set Mực Ống Nướng Sa Tế Dầu Hào & Salad Cầu Vồng – **90,000 VNĐ** *(490 kcal)*\n* **SET-SEAFOOD-03**: Set Cơm Trộn Bát Bửu Sò Điệp Nhật & Tảo Biển Wakame – **120,000 VNĐ** *(520 kcal)*\n\n#### 🧀 **Dòng Keto / Low-Carb**\n* **SET-KETO-01**: Set Đùi Gà Rút Xương Nướng Phô Mai Mozzarella – **85,000 VNĐ** *(620 kcal)*\n* **SET-KETO-02**: Set Ba Chỉ Xông Khói Trứng Chần & Bơ Quả Sáp – **90,000 VNĐ** *(640 kcal)*\n* **SET-KETO-03**: Set Bò Cuộn Nấm Kim Châm & Salad Dầu Giấm Hạnh Nhân – **95,000 VNĐ** *(610 kcal)*\n\n#### 🍳 **Bữa Sáng / Tráng Miệng & Combo Gia Đình**\n* **SET-BREAKFAST-01**: Set Bánh Mì Đen Quả Bơ & Trứng Ốp La Thảo Mộc – **48,000 VNĐ** *(360 kcal)*\n* **SET-BREAKFAST-02**: Set Yến Mạch Ngâm Sữa Hạt Hạnh Nhân & Việt Quất – **52,000 VNĐ** *(340 kcal)*\n* **SET-SNACK-01**: Nước Ép Cần Tây Táo Xanh & Sữa Chua Hy Lạp Hạt Chia – **45,000 VNĐ** *(190 kcal)*\n* **SET-FAMILY-01**: Combo Đại Gia Đình Healthy (4 Suất Thập Cẩm) – **290,000 VNĐ** *(1,950 kcal)*\n\n---\n\n### 🚚 2. CHÍNH SÁCH GIAO HÀNG & MÃ GIẢM GIÁ GIỜ VÀNG\n\n- **Giao hàng tận nơi:** Quán đảm bảo đóng gói giữ nhiệt cẩn thận, giao món nóng hổi đúng khung giờ bạn yêu cầu.\n- **Mã ưu đãi theo khung giờ đặt hàng:**\n  - ☀️ **Khung giờ Trưa (11:00 – 13:30):** Sử dụng mã **`LUNCH15`** để được **giảm ngay 15,000 VNĐ** / đơn.\n  - 🌙 **Khung giờ Tối (17:30 – 19:30):** Sử dụng mã **`DINNER20`** để được **giảm ngay 20,000 VNĐ** / đơn.\n\n---\n\n### 💡 BẠN BẮT ĐẦU ĐẶT MÓN NHƯ THẾ NÀO?\n\nĐể quán hỗ trợ bạn chọn món và chốt đơn nhanh nhất, bạn có thể cho quán biết:\n1. Khẩu phần cho **mấy người ăn** và thời gian muốn nhận hàng?\n2. Bạn/người ăn có **tiền sử dị ứng** thực phẩm nào không (ví dụ: tôm, mực, hải sản, trứng, sữa...)?\n3. **Mã set ăn** bạn lựa chọn.\n4. **Họ tên, Số điện thoại và Địa chỉ giao hàng cụ thể**.\n\nRất hân hạnh được phục vụ bạn! Bạn muốn chọn set ăn nào cho bữa ăn hôm nay?",
+    "llm_latency_ms": 13400.04,
+    "tool_latency_ms": 0.0,
+    "latency_ms": 13400.04,
+    "usage": {
+      "prompt_tokens": 4824,
+      "completion_tokens": 1489,
+      "total_tokens": 7774
+    },
+    "cost": {
+      "usd": 0.0008085,
+      "vnd": 20.54
+    },
+    "cumulative_cost": {
+      "usd": 0.0009866,
+      "vnd": 25.06
     }
   },
   {
@@ -55,9 +288,9 @@
         "status": "Còn hàng"
       }
     },
-    "llm_latency_ms": 872.14,
-    "tool_latency_ms": 0.86,
-    "latency_ms": 873.0,
+    "llm_latency_ms": 380.32,
+    "tool_latency_ms": 1.12,
+    "latency_ms": 381.44,
     "usage": {
       "prompt_tokens": 26,
       "completion_tokens": 45,
@@ -90,9 +323,9 @@
     "action_type": "FINAL_ANSWER",
     "thought": "Đã nhận được dữ liệu món ăn từ MCP Server. Tôi tổng hợp danh sách món Bò Úc kèm calo, giá niêm yết và voucher cho khách hàng.",
     "output": "[Healthy Food Assistant]: Dạ, mình đã tra cứu thực đơn thời gian thực cho bạn! Dưới đây là các set Bò Úc giàu đạm:\n1. 🥩 Set Bò Úc Áp Chảo Măng Tây (SET-BEEF-01) - 110.000đ | 620 kcal (48g Protein)\n2. 🍛 Cơm Gạo Lứt Bò Xào Nấm Kim Châm (SET-BEEF-02) - 95.000đ | 580 kcal (42g Protein)\n💡 Ưu đãi: Khung giờ trưa có voucher LUNCH15 giảm 15k, tối có DINNER20 giảm 20k! Bạn muốn đặt set nào và giao đến đâu để mình chốt đơn giúp bạn ạ?",
-    "llm_latency_ms": 527.44,
+    "llm_latency_ms": 423.19,
     "tool_latency_ms": 0.0,
-    "latency_ms": 527.44,
+    "latency_ms": 423.19,
     "usage": {
       "prompt_tokens": 203,
       "completion_tokens": 107,
@@ -122,9 +355,9 @@
       "discount_amount": 15000,
       "description": "Giảm ngay 15.000 VNĐ cho mọi đơn hàng giao trong khung giờ trưa từ 11:00 đến 13:30."
     },
-    "llm_latency_ms": 506.56,
-    "tool_latency_ms": 0.67,
-    "latency_ms": 507.23,
+    "llm_latency_ms": 390.42,
+    "tool_latency_ms": 0.76,
+    "latency_ms": 391.18,
     "usage": {
       "prompt_tokens": 37,
       "completion_tokens": 45,
@@ -154,24 +387,83 @@
   {
     "step": 2,
     "query": "Tôi muốn đặt 2 suất set ăn 'SET-CLEAN-01' giao đến số 12 Chùa Bộc vào lúc 12:00 trưa nay, người nhận là Đăng (SĐT: 0912345678).",
-    "action_type": "FINAL_ANSWER",
-    "thought": "Đã nhận được dữ liệu món ăn từ MCP Server. Tôi tổng hợp danh sách món Bò Úc kèm calo, giá niêm yết và voucher cho khách hàng.",
-    "output": "[Healthy Food Assistant]: Dạ, mình đã tra cứu thực đơn thời gian thực cho bạn! Dưới đây là các set Bò Úc giàu đạm:\n1. 🥩 Set Bò Úc Áp Chảo Măng Tây (SET-BEEF-01) - 110.000đ | 620 kcal (48g Protein)\n2. 🍛 Cơm Gạo Lứt Bò Xào Nấm Kim Châm (SET-BEEF-02) - 95.000đ | 580 kcal (42g Protein)\n💡 Ưu đãi: Khung giờ trưa có voucher LUNCH15 giảm 15k, tối có DINNER20 giảm 20k! Bạn muốn đặt set nào và giao đến đâu để mình chốt đơn giúp bạn ạ?",
-    "llm_latency_ms": 497.38,
-    "tool_latency_ms": 0.0,
-    "latency_ms": 497.38,
+    "action_type": "TOOL_EXECUTION",
+    "tool_name": "order_food_set",
+    "arguments": {
+      "delivery_address": "số 12 Chùa Bộc",
+      "voucher_code": "LUNCH15",
+      "delivery_time": "12:00",
+      "phone": "0912345678",
+      "quantity": 2,
+      "customer_name": "Đăng",
+      "set_code": "SET-CLEAN-01"
+    },
+    "observation": {
+      "status": "SUCCESS",
+      "order_id": "ORD-CLEAN-01-2026",
+      "customer_name": "Đăng",
+      "set_code": "SET-CLEAN-01",
+      "set_name": "Set Eat Clean Ức Gà Nướng Thảo Mộc Quinoa",
+      "quantity": 2,
+      "delivery_address": "số 12 Chùa Bộc",
+      "delivery_time": "12:00",
+      "phone": "0912345678",
+      "voucher_applied": "LUNCH15",
+      "discount_amount": "15,000 VNĐ",
+      "total_payment": "135,000 VNĐ",
+      "notes": "Giao hàng cẩn thận",
+      "message": "Đặt đơn thành công cho khách Đăng! Đơn hàng ORD-CLEAN-01-2026 (2 suất Set Eat Clean Ức Gà Nướng Thảo Mộc Quinoa) sẽ được giao tới số 12 Chùa Bộc vào lúc 12:00. Tổng thanh toán sau giảm giá: 135,000 VNĐ."
+    },
+    "llm_latency_ms": 3140.92,
+    "tool_latency_ms": 0.95,
+    "latency_ms": 3141.87,
     "usage": {
-      "prompt_tokens": 141,
-      "completion_tokens": 107,
-      "total_tokens": 248
+      "prompt_tokens": 2471,
+      "completion_tokens": 92,
+      "total_tokens": 2917
     },
     "cost": {
-      "usd": 4.27e-05,
-      "vnd": 1.08
+      "usd": 0.0002129,
+      "vnd": 5.41
     },
     "cumulative_cost": {
-      "usd": 5.9e-05,
-      "vnd": 1.49
+      "usd": 0.0002292,
+      "vnd": 5.82
+    },
+    "hierarchy": {
+      "tier": 3,
+      "tier_name": "Tầng 3: Chốt đơn / Giao dịch",
+      "execution_mode": "SEQUENTIAL",
+      "can_parallel_with": [],
+      "depends_on": [
+        "query_food_set",
+        "check_voucher"
+      ],
+      "description": "Bắt buộc chạy sau cùng khi đã chốt món ăn và áp mã giảm giá."
+    },
+    "is_duplicate_blocked": false
+  },
+  {
+    "step": 3,
+    "query": "Tôi muốn đặt 2 suất set ăn 'SET-CLEAN-01' giao đến số 12 Chùa Bộc vào lúc 12:00 trưa nay, người nhận là Đăng (SĐT: 0912345678).",
+    "action_type": "FINAL_ANSWER",
+    "thought": "Gemini phản hồi trực tiếp bằng văn bản (không cần gọi công cụ).",
+    "output": "Dạ, chúc mừng anh Đăng! Đơn đặt hàng của anh đã được ghi nhận thành công trên hệ thống. Dưới đây là thông tin chi tiết đơn hàng của anh:\n\n📋 **THÔNG TIN ĐƠN HÀNG #ORD-CLEAN-01-2026**\n- **Người nhận:** Đăng (SĐT: 0912345678)\n- **Địa chỉ giao:** Số 12 Chùa Bộc\n- **Thời gian giao:** 12:00 trưa nay\n- **Sản phẩm:** 2x **Set Eat Clean Ức Gà Nướng Thảo Mộc Quinoa** (Mã: SET-CLEAN-01)\n- **Ưu đãi áp dụng:** Mã `LUNCH15` (Khung giờ vàng 11:00 - 13:30) — Giảm **15.000 VNĐ**\n- **💰 Tổng thanh toán:** **135.000 VNĐ**\n- **Ghi chú:** Giao hàng cẩn thận\n\nĐơn hàng đang được chuẩn bị và sẽ giao đến đúng giờ. Chúc anh Đăng có một bữa trưa ngon miệng và thật nhiều năng lượng! Nếu cần hỗ trợ thêm, anh vui lòng nhắn cho em nhé!",
+    "llm_latency_ms": 4324.37,
+    "tool_latency_ms": 0.0,
+    "latency_ms": 4324.37,
+    "usage": {
+      "prompt_tokens": 2940,
+      "completion_tokens": 286,
+      "total_tokens": 3542
+    },
+    "cost": {
+      "usd": 0.0003063,
+      "vnd": 7.78
+    },
+    "cumulative_cost": {
+      "usd": 0.0005355,
+      "vnd": 13.6
     }
   },
   {
@@ -225,9 +517,9 @@
         }
       ]
     },
-    "llm_latency_ms": 508.58,
-    "tool_latency_ms": 0.96,
-    "latency_ms": 509.54,
+    "llm_latency_ms": 452.48,
+    "tool_latency_ms": 1.49,
+    "latency_ms": 453.97,
     "usage": {
       "prompt_tokens": 37,
       "completion_tokens": 45,
@@ -257,24 +549,68 @@
   {
     "step": 2,
     "query": "Tôi đang cần giảm cân nhưng bị dị ứng hải sản. Bạn hãy gợi ý set ăn phù hợp và đặt giúp tôi 1 suất giao lúc 18:30 tối nay nhé.",
+    "action_type": "TOOL_EXECUTION",
+    "tool_name": "check_voucher",
+    "arguments": {
+      "order_time": "18:30"
+    },
+    "observation": {
+      "status": "SUCCESS",
+      "has_voucher": true,
+      "voucher_code": "MORNING10",
+      "discount_amount": 10000,
+      "description": "Giảm 10.000 VNĐ cho các set ăn sáng lành mạnh nạp năng lượng ngày mới (07:00 - 09:30)."
+    },
+    "llm_latency_ms": 5102.89,
+    "tool_latency_ms": 0.75,
+    "latency_ms": 5103.64,
+    "usage": {
+      "prompt_tokens": 2852,
+      "completion_tokens": 22,
+      "total_tokens": 3254
+    },
+    "cost": {
+      "usd": 0.0002205,
+      "vnd": 5.6
+    },
+    "cumulative_cost": {
+      "usd": 0.0002368,
+      "vnd": 6.01
+    },
+    "hierarchy": {
+      "tier": 1,
+      "tier_name": "Tầng 1: Độc lập / Khung giờ",
+      "execution_mode": "PARALLEL",
+      "can_parallel_with": [
+        "calculate_diet_portion",
+        "check_allergy"
+      ],
+      "depends_on": [],
+      "description": "Kiểm tra voucher giờ vàng độc lập theo thời gian nhận."
+    },
+    "is_duplicate_blocked": false
+  },
+  {
+    "step": 3,
+    "query": "Tôi đang cần giảm cân nhưng bị dị ứng hải sản. Bạn hãy gợi ý set ăn phù hợp và đặt giúp tôi 1 suất giao lúc 18:30 tối nay nhé.",
     "action_type": "FINAL_ANSWER",
     "thought": "Đã nhận được dữ liệu quan sát từ MCP Server. Tôi xuất câu trả lời gợi ý Eat Clean kèm giá và calo.",
     "output": "[Healthy Food Assistant]: Dạ, mình đã kiểm tra kho món Eat Clean:\n1. 🥗 Set Eat Clean Ức Gà Nướng Quinoa (SET-CLEAN-01) - 75.000đ | 480 kcal\n2. 🥑 Salad Cá Hồi Áp Chảo Bơ Sáp (SET-CLEAN-02) - 120.000đ | 520 kcal\n💡 Các món đều an toàn, tươi mới trong ngày và áp dụng voucher giờ vàng. Bạn muốn đặt giao đến địa chỉ nào ạ?",
-    "llm_latency_ms": 493.26,
+    "llm_latency_ms": 422.27,
     "tool_latency_ms": 0.0,
-    "latency_ms": 493.26,
+    "latency_ms": 422.27,
     "usage": {
-      "prompt_tokens": 397,
+      "prompt_tokens": 494,
       "completion_tokens": 79,
-      "total_tokens": 476
+      "total_tokens": 573
     },
     "cost": {
-      "usd": 5.35e-05,
-      "vnd": 1.36
+      "usd": 6.07e-05,
+      "vnd": 1.54
     },
     "cumulative_cost": {
-      "usd": 6.98e-05,
-      "vnd": 1.77
+      "usd": 0.0002975,
+      "vnd": 7.55
     }
   },
   {
@@ -289,9 +625,9 @@
       "status": "NOT_FOUND",
       "message": "Không tìm thấy thông tin set đồ ăn có mã 'SET-VIP-9999' trong hệ thống thực đơn quán."
     },
-    "llm_latency_ms": 519.11,
-    "tool_latency_ms": 0.74,
-    "latency_ms": 519.85,
+    "llm_latency_ms": 444.73,
+    "tool_latency_ms": 1.03,
+    "latency_ms": 445.76,
     "usage": {
       "prompt_tokens": 20,
       "completion_tokens": 45,
@@ -324,9 +660,9 @@
     "action_type": "FINAL_ANSWER",
     "thought": "Đã nhận được dữ liệu quan sát từ MCP Server. Tôi sẽ xuất câu trả lời hoàn chỉnh cho khách hàng.",
     "output": "Dạ mình đã tổng hợp đầy đủ thông tin từ hệ thống MCP Server: Thực phẩm luôn tươi mới trong ngày, an toàn thực phẩm 100% và sẵn sàng phục vụ quý khách! Bạn cần tư vấn thêm set nào nữa không ạ?",
-    "llm_latency_ms": 503.43,
+    "llm_latency_ms": 376.3,
     "tool_latency_ms": 0.0,
-    "latency_ms": 503.43,
+    "latency_ms": 376.3,
     "usage": {
       "prompt_tokens": 98,
       "completion_tokens": 47,
