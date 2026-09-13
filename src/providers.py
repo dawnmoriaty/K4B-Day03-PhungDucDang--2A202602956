@@ -39,29 +39,28 @@ class MockOfflineProvider(BaseLLMProvider):
         
         # 1. Đã có đủ thông tin sau quan sát -> Xuất Final Answer
         if "kết quả công cụ (observation):" in prompt_lower:
-            return {
+            res = {
                 "type": "text",
                 "content": "Dạ mình đã tổng hợp đầy đủ thông tin từ hệ thống: Khách hàng an toàn với các set gợi ý, áp dụng ưu đãi giờ vàng thành công và sẵn sàng phục vụ quý khách!",
                 "thought": "Đã nhận được dữ liệu quan sát từ MCP Server. Tôi sẽ xuất câu trả lời hoàn chỉnh cho khách hàng."
             }
-
         # 2. Xử lý kịch bản Đặt set đồ ăn (Food Assistant)
-        if "dị ứng" in prompt_lower and "check_allergy" not in prompt_lower:
-            return {
+        elif "dị ứng" in prompt_lower and "check_allergy" not in prompt_lower:
+            res = {
                 "type": "tool_call",
                 "tool_name": "check_allergy",
                 "arguments": {"allergy_info": "dị ứng hải sản"},
                 "thought": "Khách hàng có đề cập đến tiền sử dị ứng thực phẩm. Tôi cần gọi tool check_allergy trước để đảm bảo an toàn tuyệt đối."
             }
         elif ("ăn tối" in prompt_lower or "tối nay" in prompt_lower or "18:30" in prompt_lower) and "check_voucher" not in prompt_lower:
-            return {
+            res = {
                 "type": "tool_call",
                 "tool_name": "check_voucher",
                 "arguments": {"order_time": "18:30 tối"},
                 "thought": "Khách hàng muốn ăn hoặc giao hàng vào buổi tối. Tôi sẽ kiểm tra mã ưu đãi giờ vàng bữa tối bằng tool check_voucher."
             }
-        elif "đặt 2 suất" in prompt_lower or "đặt" in prompt_lower and "chùa bộc" in prompt_lower:
-            return {
+        elif "đặt 2 suất" in prompt_lower or ("đặt" in prompt_lower and "chùa bộc" in prompt_lower):
+            res = {
                 "type": "tool_call",
                 "tool_name": "order_food_set",
                 "arguments": {
@@ -75,39 +74,48 @@ class MockOfflineProvider(BaseLLMProvider):
                 "thought": "Khách hàng yêu cầu đặt món với đầy đủ thông tin địa chỉ và thời gian. Tôi sẽ tiến hành gọi tool order_food_set để tạo đơn hàng."
             }
         elif "set-vip-9999" in prompt_lower:
-            return {
+            res = {
                 "type": "tool_call",
                 "tool_name": "query_food_set",
                 "arguments": {"set_code": "SET-VIP-9999"},
                 "thought": "Khách hàng muốn tra cứu thông tin set ăn có mã SET-VIP-9999. Tôi sẽ gọi tool query_food_set."
             }
         elif "set-clean-01" in prompt_lower or "tra cứu thông tin chi tiết" in prompt_lower:
-            return {
+            res = {
                 "type": "tool_call",
                 "tool_name": "query_food_set",
                 "arguments": {"set_code": "SET-CLEAN-01"},
                 "thought": "Khách hàng muốn tra cứu thông tin dinh dưỡng set SET-CLEAN-01. Tôi sẽ gọi tool query_food_set."
             }
         elif "sv2026001" in prompt_lower and "đặt lịch" in prompt_lower:
-            return {
+            res = {
                 "type": "tool_call",
                 "tool_name": "schedule_appointment",
                 "arguments": {"student_id": "SV2026001", "datetime_str": "14:00 15/09/2026", "advisor_name": "PGS.TS Nguyễn Văn A"},
                 "thought": "Người dùng yêu cầu đặt lịch hẹn tư vấn cho sinh viên SV2026001. Tôi sẽ gọi tool schedule_appointment."
             }
         elif "sv2026001" in prompt_lower or "tra cứu thông tin học vụ" in prompt_lower:
-            return {
+            res = {
                 "type": "tool_call",
                 "tool_name": "academic_query",
                 "arguments": {"student_id": "SV2026001"},
                 "thought": "Người dùng muốn tra cứu thông tin học vụ của sinh viên SV2026001. Tôi sẽ gọi tool academic_query."
             }
         else:
-            return {
+            res = {
                 "type": "text",
                 "content": "[Healthy Food Assistant]: Chào bạn! Quán chúng mình chuyên cung cấp các set ăn lành mạnh gồm: Eat Clean (giảm mỡ), Thuần chay (dưỡng sinh), Bò Úc (tăng cơ) và Keto. Quán có giao hàng tận nơi từ 07:00 đến 21:30 hàng ngày với nhiều voucher giờ vàng hấp dẫn!",
                 "thought": "Câu hỏi chung về thực đơn và chính sách của quán, trả lời trực tiếp từ System Prompt mà không cần gọi Tool."
             }
+            
+        p_tokens = max(20, len(prompt) // 4)
+        c_tokens = max(25, len(res.get("content", "")) // 4 if res.get("type") == "text" else 45)
+        res["usage"] = {
+            "prompt_tokens": p_tokens,
+            "completion_tokens": c_tokens,
+            "total_tokens": p_tokens + c_tokens
+        }
+        return res
 
 
 class GeminiProvider(BaseLLMProvider):
@@ -163,6 +171,17 @@ class GeminiProvider(BaseLLMProvider):
                 config=config
             )
 
+            # Trích xuất thống kê Token thực tế
+            usage = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+            if hasattr(response, 'usage_metadata') and response.usage_metadata:
+                usage["prompt_tokens"] = getattr(response.usage_metadata, 'prompt_token_count', 0) or 0
+                usage["completion_tokens"] = getattr(response.usage_metadata, 'candidates_token_count', 0) or 0
+                usage["total_tokens"] = getattr(response.usage_metadata, 'total_token_count', 0) or (usage["prompt_tokens"] + usage["completion_tokens"])
+            if usage["total_tokens"] == 0:
+                usage["prompt_tokens"] = max(10, len(prompt) // 4)
+                usage["completion_tokens"] = max(10, len(response.text or '') // 4) if not response.function_calls else 45
+                usage["total_tokens"] = usage["prompt_tokens"] + usage["completion_tokens"]
+
             # Kiểm tra xem Gemini có trả về Tool Call không
             if response.function_calls:
                 call = response.function_calls[0]
@@ -171,13 +190,15 @@ class GeminiProvider(BaseLLMProvider):
                     "type": "tool_call",
                     "tool_name": call.name,
                     "arguments": args,
-                    "thought": f"Gemini quyết định gọi công cụ '{call.name}' với tham số: {json.dumps(args, ensure_ascii=False)}"
+                    "thought": f"Gemini quyết định gọi công cụ '{call.name}' với tham số: {json.dumps(args, ensure_ascii=False)}",
+                    "usage": usage
                 }
             else:
                 return {
                     "type": "text",
                     "content": response.text or "",
-                    "thought": "Gemini phản hồi trực tiếp bằng văn bản (không cần gọi công cụ)."
+                    "thought": "Gemini phản hồi trực tiếp bằng văn bản (không cần gọi công cụ).",
+                    "usage": usage
                 }
 
         except Exception as e:
@@ -240,6 +261,12 @@ class OpenAIProvider(BaseLLMProvider):
                 tool_choice="auto" if tools else None
             )
 
+            usage = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+            if hasattr(response, 'usage') and response.usage:
+                usage["prompt_tokens"] = getattr(response.usage, 'prompt_tokens', 0) or 0
+                usage["completion_tokens"] = getattr(response.usage, 'completion_tokens', 0) or 0
+                usage["total_tokens"] = getattr(response.usage, 'total_tokens', 0) or (usage["prompt_tokens"] + usage["completion_tokens"])
+
             msg = response.choices[0].message
             if msg.tool_calls:
                 call = msg.tool_calls[0]
@@ -248,13 +275,15 @@ class OpenAIProvider(BaseLLMProvider):
                     "type": "tool_call",
                     "tool_name": call.function.name,
                     "arguments": args,
-                    "thought": f"OpenAI quyết định gọi công cụ '{call.function.name}' với tham số: {json.dumps(args, ensure_ascii=False)}"
+                    "thought": f"OpenAI quyết định gọi công cụ '{call.function.name}' với tham số: {json.dumps(args, ensure_ascii=False)}",
+                    "usage": usage
                 }
             else:
                 return {
                     "type": "text",
                     "content": msg.content or "",
-                    "thought": "OpenAI phản hồi trực tiếp bằng văn bản (không cần gọi công cụ)."
+                    "thought": "OpenAI phản hồi trực tiếp bằng văn bản (không cần gọi công cụ).",
+                    "usage": usage
                 }
         except Exception as e:
             print(f"⚠️ [OpenAI API Warning]: Không thể kết nối live API ({str(e)}). Tự động fallback về Mock.")

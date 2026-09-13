@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ReAct Agent Observability Dashboard | VinUni Lab 03</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <!-- Highlight.js for JSON syntax highlighting -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+
+  <!-- Marked.js for Markdown Rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <style>
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    
+    .timeline-line::before {
+      content: '';
+      position: absolute;
+      left: 19px;
+      top: 36px;
+      bottom: -15px;
+      width: 2px;
+      background: #334155;
+    }
+    .timeline-item:last-child .timeline-line::before {
+      display: none;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-emerald-500 selection:text-white">
+
+  <!-- ================= TOP HEADER ================= -->
+  <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 sticky top-0 z-40 px-4 py-3 shadow-md">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+      
+      <!-- Brand & Title -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center text-white text-xl shadow-lg shadow-emerald-500/20">
+          <i class="fa-solid fa-robot"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-lg font-bold tracking-tight bg-gradient-to-r from-emerald-400 to-teal-200 bg-clip-text text-transparent">
+              ReAct Agent Observability
+            </h1>
+            <span class="px-2 py-0.5 text-xs font-semibold rounded bg-emerald-950 text-emerald-300 border border-emerald-800">
+              Lab 03
+            </span>
+          </div>
+          <p class="text-xs text-slate-400">
+            VinUni AI Course • Sinh viên: <strong class="text-slate-200">Phùng Đức Đăng</strong> (<span class="text-emerald-400 font-mono">2A202602956</span>)
+          </p>
+        </div>
+      </div>
+
+      <!-- Center: Model & Server Status -->
+      <div class="hidden md:flex items-center gap-3 bg-slate-950/80 px-3 py-1.5 rounded-lg border border-slate-800 text-xs">
+        <span class="flex h-2.5 w-2.5 relative">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+        </span>
+        <span class="text-slate-400">Model:</span>
+        <span id="header-model" class="font-mono font-medium text-emerald-400">gemini-3.6-flash</span>
+        <span class="text-slate-600">|</span>
+        <span class="text-slate-400">MCP Server:</span>
+        <span class="font-semibold text-teal-300">JSON-RPC 2.0</span>
+      </div>
+
+      <!-- Right: Mode Switcher & Menu Modal Trigger -->
+      <div class="flex items-center gap-2">
+        <button id="btn-open-menu-modal" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-2 shadow-sm">
+          <i class="fa-solid fa-utensils text-emerald-400"></i>
+          <span>Thực Đơn (21 món)</span>
+        </button>
+
+        <div class="flex bg-slate-800 p-0.5 rounded-lg border border-slate-700 text-xs">
+          <button id="mode-react" class="px-3 py-1 rounded-md font-semibold transition bg-emerald-600 text-white shadow">
+            <i class="fa-solid fa-brain mr-1"></i> ReAct Agent
+          </button>
+          <button id="mode-baseline" class="px-3 py-1 rounded-md font-medium text-slate-400 hover:text-slate-200 transition">
+            <i class="fa-solid fa-comment-dots mr-1"></i> Chatbot Baseline
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ================= MAIN LAYOUT ================= -->
+  <main class="max-w-7xl mx-auto w-full flex-1 p-4 grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+    <!-- ================= LEFT COLUMN: CONTROL & METRICS (5 COLS) ================= -->
+    <div class="lg:col-span-5 flex flex-col gap-4">
+      
+      <!-- 1. LOOP CONTROLLER (MAX ITERATIONS SAFEGUARD) -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-repeat text-emerald-400"></i>
+            <h2 class="text-sm font-semibold text-slate-200">Loop Controller (Max Iterations)</h2>
+          </div>
+          <span id="loop-count-badge" class="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-emerald-950 text-emerald-400 border border-emerald-700">
+            7 vòng lặp
+          </span>
+        </div>
+        
+        <p class="text-xs text-slate-400 mb-3">
+          Safeguard giới hạn số bước suy luận tối đa để tránh Agent rơi vào vòng lặp vô hạn.
+        </p>
+
+        <div class="flex items-center gap-3">
+          <span class="text-xs font-mono text-slate-500">1</span>
+          <input id="slider-max-iterations" type="range" min="1" max="15" value="7" 
+                 class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-500">
+          <span class="text-xs font-mono text-slate-500">15</span>
+        </div>
+
+        <div id="loop-warning" class="mt-2 text-[11px] text-emerald-400 flex items-center gap-1.5">
+          <i class="fa-solid fa-circle-check"></i>
+          <span>Cấu hình 7 bước: Tối ưu cho chuỗi reasoning đa chặng.</span>
+        </div>
+      </div>
+
+      <!-- 2. TOKEN & COST CALCULATOR -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-sm">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-coins text-amber-400"></i>
+            <h2 class="text-sm font-semibold text-slate-200">Đo Lường Token & Chi Phí (Cost Tracker)</h2>
+          </div>
+          <span class="text-[11px] text-slate-400 font-mono">1 USD ≈ 25.400 đ</span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5 mb-3">
+          <div class="bg-slate-950/80 p-2.5 rounded-lg border border-slate-800/80">
+            <div class="text-[11px] text-slate-400 flex items-center justify-between">
+              <span>Input Tokens:</span>
+              <i class="fa-solid fa-arrow-down-long text-blue-400"></i>
+            </div>
+            <div id="metric-prompt-tokens" class="text-lg font-bold font-mono text-blue-400 mt-0.5">0</div>
+            <div class="text-[10px] text-slate-500">$0.075 / 1M tokens</div>
+          </div>
+
+          <div class="bg-slate-950/80 p-2.5 rounded-lg border border-slate-800/80">
+            <div class="text-[11px] text-slate-400 flex items-center justify-between">
+              <span>Output Tokens:</span>
+              <i class="fa-solid fa-arrow-up-long text-purple-400"></i>
+            </div>
+            <div id="metric-completion-tokens" class="text-lg font-bold font-mono text-purple-400 mt-0.5">0</div>
+            <div class="text-[10px] text-slate-500">$0.30 / 1M tokens</div>
+          </div>
+
+          <div class="bg-slate-950/80 p-2.5 rounded-lg border border-slate-800/80">
+            <div class="text-[11px] text-slate-400 flex items-center justify-between">
+              <span>Chi Phí USD:</span>
+              <i class="fa-solid fa-dollar-sign text-emerald-400"></i>
+            </div>
+            <div id="metric-cost-usd" class="text-lg font-bold font-mono text-emerald-400 mt-0.5">$0.00000</div>
+            <div class="text-[10px] text-slate-500">Ước tính theo Gemini API</div>
+          </div>
+
+          <div class="bg-slate-950/80 p-2.5 rounded-lg border border-slate-800/80">
+            <div class="text-[11px] text-slate-400 flex items-center justify-between">
+              <span>Chi Phí VNĐ:</span>
+              <i class="fa-solid fa-dong-sign text-amber-400"></i>
+            </div>
+            <div id="metric-cost-vnd" class="text-lg font-bold font-mono text-amber-400 mt-0.5">0.00 đ</div>
+            <div class="text-[10px] text-slate-500">Quy đổi VND trực tiếp</div>
+          </div>
+        </div>
+
+        <!-- Budget Guardrail Bar -->
+        <div>
+          <div class="flex justify-between text-[11px] text-slate-400 mb-1">
+            <span>Budget Ceiling Safeguard (Trần an toàn 500 đ / lượt):</span>
+            <span id="budget-percent" class="font-mono text-emerald-400 font-medium">0%</span>
+          </div>
+          <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+            <div id="budget-bar" class="bg-emerald-500 h-full w-0 transition-all duration-500"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. PROMPT HINTS & QUICK SUGGESTIONS -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-sm flex-1 flex flex-col">
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-wand-magic-sparkles text-teal-400"></i>
+            <h2 class="text-sm font-semibold text-slate-200">Gợi Ý Prompt Theo Slide VinUni (Quick Chips)</h2>
+          </div>
+          <span class="text-[11px] text-slate-400">Bấm 1-click</span>
+        </div>
+
+        <div class="space-y-1.5 flex-1 overflow-y-auto max-h-72 pr-1">
+          
+          <button class="btn-quick-prompt w-full text-left p-2.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800/80 hover:border-emerald-700/60 transition group text-xs flex items-start gap-2.5"
+                  data-prompt="Chào bạn, quán của mình có những loại set ăn nào và chính sách giao hàng ra sao?">
+            <span class="text-emerald-400 mt-0.5"><i class="fa-solid fa-list-check"></i></span>
+            <div>
+              <div class="font-medium text-slate-200 group-hover:text-emerald-300">TC01: Tra cứu menu tổng quan & Voucher</div>
+              <div class="text-[11px] text-slate-400 mt-0.5">Khám phá các set ăn, giá bán và chính sách ưu đãi giờ vàng.</div>
+            </div>
+          </button>
+
+          <button class="btn-quick-prompt w-full text-left p-2.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800/80 hover:border-emerald-700/60 transition group text-xs flex items-start gap-2.5"
+                  data-prompt="Cho tôi tra cứu thông tin chi tiết và thành phần dinh dưỡng của set 'SET-CLEAN-01'.">
+            <span class="text-teal-400 mt-0.5"><i class="fa-solid fa-magnifying-glass"></i></span>
+            <div>
+              <div class="font-medium text-slate-200 group-hover:text-teal-300">TC02: Chi tiết thành phần set 'SET-CLEAN-01'</div>
+              <div class="text-[11px] text-slate-400 mt-0.5">Truy vấn calo, protein, carb, fat và nguyên liệu chi tiết.</div>
+            </div>
+          </button>
+
+          <button class="btn-quick-prompt w-full text-left p-2.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800/80 hover:border-emerald-700/60 transition group text-xs flex items-start gap-2.5"
+                  data-prompt="Tôi muốn đặt 2 suất set ăn 'SET-CLEAN-01' giao đến số 12 Chùa Bộc vào lúc 12:00 trưa nay, người nhận là Đăng (SĐT: 0912345678).">
+            <span class="text-emerald-400 mt-0.5"><i class="fa-solid fa-bag-shopping"></i></span>
+            <div>
+              <div class="font-medium text-slate-200 group-hover:text-emerald-300">TC03: Đặt 2 suất trưa áp mã LUNCH15</div>
+              <div class="text-[11px] text-slate-400 mt-0.5">Chuỗi hành động: Kiểm tra voucher trưa ➔ Tạo đơn hàng.</div>
+            </div>
+          </button>
+
+          <button class="btn-quick-prompt w-full text-left p-2.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800/80 hover:border-amber-700/60 transition group text-xs flex items-start gap-2.5"
+                  data-prompt="Tôi đang cần giảm cân nhưng bị dị ứng hải sản. Bạn hãy gợi ý set ăn phù hợp và đặt giúp tôi 1 suất giao lúc 18:30 tối nay nhé.">
+            <span class="text-amber-400 mt-0.5"><i class="fa-solid fa-triangle-exclamation"></i></span>
+            <div>
+              <div class="font-medium text-slate-200 group-hover:text-amber-300">TC04: Kiểm tra dị ứng hải sản & Set an toàn</div>
+              <div class="text-[11px] text-slate-400 mt-0.5">Gọi check_allergy ➔ check_voucher tối ➔ Gợi ý món an toàn.</div>
+            </div>
+          </button>
+
+          <button class="btn-quick-prompt w-full text-left p-2.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800/80 hover:border-red-700/60 transition group text-xs flex items-start gap-2.5"
+                  data-prompt="Tra cứu giúp tôi set ăn có mã 'SET-VIP-9999'.">
+            <span class="text-red-400 mt-0.5"><i class="fa-solid fa-circle-xmark"></i></span>
+            <div>
+              <div class="font-medium text-slate-200 group-hover:text-red-300">TC05: Set không tồn tại (Not Found Handling)</div>
+              <div class="text-[11px] text-slate-400 mt-0.5">Kiểm thử khả năng xử lý ngoại lệ khi tra cứu món không có.</div>
+            </div>
+          </button>
+
+          <button class="btn-quick-prompt w-full text-left p-2.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800/80 hover:border-indigo-700/60 transition group text-xs flex items-start gap-2.5"
+                  data-prompt="Tôi nặng 72kg, tập gym 4 buổi/tuần muốn tăng cơ giảm mỡ. Hãy tính khẩu phần và gợi ý ít nhất 3 set phù hợp!">
+            <span class="text-indigo-400 mt-0.5"><i class="fa-solid fa-dumbbell"></i></span>
+            <div>
+              <div class="font-medium text-slate-200 group-hover:text-indigo-300">Case Gym: Tính định lượng calo & đạm</div>
+              <div class="text-[11px] text-slate-400 mt-0.5">Kích hoạt tool calculate_diet_portion và query_food_set.</div>
+            </div>
+          </button>
+
+          <button class="btn-quick-prompt w-full text-left p-2.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800/80 hover:border-pink-700/60 transition group text-xs flex items-start gap-2.5"
+                  data-prompt="Cho tôi set ăn tối.">
+            <span class="text-pink-400 mt-0.5"><i class="fa-solid fa-question"></i></span>
+            <div>
+              <div class="font-medium text-slate-200 group-hover:text-pink-300">Prompt Thiếu Thông Tin: Hỏi lại & Gợi ý 3 món</div>
+              <div class="text-[11px] text-slate-400 mt-0.5">Đề xuất 3 món và hỏi lại thông tin nhận hàng, dị ứng.</div>
+            </div>
+          </button>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ================= RIGHT COLUMN: OBSERVABILITY STREAM & CHAT (7 COLS) ================= -->
+    <div class="lg:col-span-7 flex flex-col gap-4">
+      
+      <!-- 1. WATERFALL TRACE STREAM PANEL -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-sm flex-1 flex flex-col min-h-[480px]">
+        
+        <!-- Stream Header -->
+        <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-timeline text-emerald-400"></i>
+            <h2 class="text-sm font-semibold text-slate-200">Waterfall Trace Log (ReAct Observability)</h2>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="badge-total-steps" class="px-2 py-0.5 rounded bg-slate-800 text-slate-400 text-xs font-mono">0 bước</span>
+            <span id="badge-total-latency" class="px-2 py-0.5 rounded bg-slate-800 text-emerald-400 text-xs font-mono">0 ms</span>
+            <button id="btn-clear-trace" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-red-400 text-xs transition" title="Xóa màn hình log">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Trace Items Container (Scrollable) -->
+        <div id="trace-container" class="flex-1 overflow-y-auto space-y-4 pr-2 max-h-[500px]">
+          
+          <!-- Empty State -->
+          <div id="empty-state" class="h-full flex flex-col items-center justify-center text-center p-8 text-slate-500">
+            <div class="w-14 h-14 rounded-full bg-slate-950 border border-slate-800 flex items-center justify-center text-slate-600 text-2xl mb-3">
+              <i class="fa-solid fa-route"></i>
+            </div>
+            <h3 class="text-sm font-medium text-slate-400">Chưa có sự kiện Trace nào</h3>
+            <p class="text-xs text-slate-500 max-w-sm mt-1">
+              Chọn một Prompt gợi ý bên trái hoặc nhập yêu cầu phía dưới để quan sát chuỗi suy luận <span class="text-emerald-400">Thought ➔ Action ➔ Observation</span> theo thời gian thực.
+            </p>
+          </div>
+
+        </div>
+
+        <!-- FINAL ANSWER BOX (HIGHLIGHTED) -->
+        <div id="final-answer-wrapper" class="hidden mt-4 pt-3 border-t border-slate-800">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2 text-xs font-semibold text-emerald-400">
+              <i class="fa-solid fa-flag-checkered"></i>
+              <span>CÂU TRẢ LỜI CUỐI CÙNG (FINAL ANSWER)</span>
+            </div>
+            <button id="btn-copy-answer" class="text-xs text-slate-400 hover:text-slate-200 flex items-center gap-1 transition">
+              <i class="fa-regular fa-copy"></i>
+              <span>Sao chép</span>
+            </button>
+          </div>
+          <div id="final-answer-content" class="bg-slate-950/90 border border-emerald-900/60 rounded-xl p-4 text-xs text-slate-200 leading-relaxed max-h-60 overflow-y-auto prose prose-invert prose-xs">
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 2. INTERACTIVE CHAT INPUT BAR -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 shadow-sm">
+        <form id="chat-form" class="flex gap-2 items-end">
+          <div class="flex-1 relative">
+            <textarea id="input-query" rows="2" 
+                      placeholder="Nhập yêu cầu tư vấn thực đơn, dị ứng, tính calo hoặc đặt suất ăn..."
+                      class="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-lg p-3 text-xs text-slate-100 placeholder-slate-500 resize-none outline-none transition"></textarea>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <button id="btn-send" type="submit" 
+                    class="px-4 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition flex items-center justify-center gap-2 shadow-sm disabled:opacity-50">
+              <span id="btn-send-text">Gửi</span>
+              <i class="fa-solid fa-paper-plane text-[10px]"></i>
+            </button>
+            <button id="btn-reset-input" type="button" 
+                    class="px-4 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-medium transition text-center">
+              Xóa
+            </button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ================= MENU & VOUCHERS MODAL ================= -->
+  <div id="menu-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-4xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+      
+      <!-- Modal Header -->
+      <div class="px-5 py-4 border-b border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+            <i class="fa-solid fa-book-open"></i>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-slate-100">Dữ Liệu Thực Đơn & Voucher (Data Explorer)</h3>
+            <p class="text-xs text-slate-400">21 Set ăn phong phú với thông số dinh dưỡng chi tiết & danh sách voucher</p>
+          </div>
+        </div>
+        <button id="btn-close-menu-modal" class="w-8 h-8 rounded-lg bg-slate-800 text-slate-400 hover:text-slate-200 flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Modal Filter Tabs -->
+      <div class="px-5 py-2.5 bg-slate-950/50 border-b border-slate-800 flex flex-wrap gap-2 text-xs">
+        <button class="btn-menu-tab px-3 py-1 rounded-md bg-emerald-600 text-white font-medium" data-filter="all">Tất cả (21 món)</button>
+        <button class="btn-menu-tab px-3 py-1 rounded-md bg-slate-800 text-slate-300 hover:bg-slate-700" data-filter="Eat Clean">Eat Clean</button>
+        <button class="btn-menu-tab px-3 py-1 rounded-md bg-slate-800 text-slate-300 hover:bg-slate-700" data-filter="Thuần Chay">Thuần Chay (Vegan)</button>
+        <button class="btn-menu-tab px-3 py-1 rounded-md bg-slate-800 text-slate-300 hover:bg-slate-700" data-filter="Hải sản">Hải Sản</button>
+        <button class="btn-menu-tab px-3 py-1 rounded-md bg-slate-800 text-slate-300 hover:bg-slate-700" data-filter="Tăng cơ">Tăng Cơ Gym</button>
+        <button class="btn-menu-tab px-3 py-1 rounded-md bg-slate-800 text-slate-300 hover:bg-slate-700" data-filter="Keto">Keto Low-Carb</button>
+        <button class="btn-menu-tab px-3 py-1 rounded-md bg-slate-800 text-slate-300 hover:bg-slate-700" data-filter="Bữa Sáng">Bữa Sáng / Detox</button>
+        <button class="btn-menu-tab px-3 py-1 rounded-md bg-amber-900/60 text-amber-300 hover:bg-amber-800/60" data-filter="vouchers">Mã Voucher</button>
+      </div>
+
+      <!-- Modal Body (Grid of Cards) -->
+      <div id="modal-content-container" class="p-5 overflow-y-auto flex-1 grid grid-cols-1 md:grid-cols-2 gap-3.5">
+        <div class="col-span-2 text-center py-10 text-slate-400">Đang tải dữ liệu thực đơn...</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= JAVASCRIPT LOGIC ================= -->
+  <script>
+    // State
+    let currentMode = 'react'; // 'react' hoặc 'baseline'
+    let maxIterations = 7;
+    let menuItems = [];
+    let vouchersList = [];
+
+    // DOM Elements
+    const modeReactBtn = document.getElementById('mode-react');
+    const modeBaselineBtn = document.getElementById('mode-baseline');
+    const sliderMaxIterations = document.getElementById('slider-max-iterations');
+    const loopCountBadge = document.getElementById('loop-count-badge');
+    const loopWarning = document.getElementById('loop-warning');
+    const chatForm = document.getElementById('chat-form');
+    const inputQuery = document.getElementById('input-query');
+    const btnSend = document.getElementById('btn-send');
+    const btnSendText = document.getElementById('btn-send-text');
+    const btnResetInput = document.getElementById('btn-reset-input');
+    const btnClearTrace = document.getElementById('btn-clear-trace');
+    const traceContainer = document.getElementById('trace-container');
+    const emptyState = document.getElementById('empty-state');
+    const finalAnswerWrapper = document.getElementById('final-answer-wrapper');
+    const finalAnswerContent = document.getElementById('final-answer-content');
+    const btnCopyAnswer = document.getElementById('btn-copy-answer');
+    
+    // Metrics DOM
+    const metricPromptTokens = document.getElementById('metric-prompt-tokens');
+    const metricCompletionTokens = document.getElementById('metric-completion-tokens');
+    const metricCostUsd = document.getElementById('metric-cost-usd');
+    const metricCostVnd = document.getElementById('metric-cost-vnd');
+    const budgetPercent = document.getElementById('budget-percent');
+    const budgetBar = document.getElementById('budget-bar');
+    const badgeTotalSteps = document.getElementById('badge-total-steps');
+    const badgeTotalLatency = document.getElementById('badge-total-latency');
+
+    // Modal Elements
+    const btnOpenMenuModal = document.getElementById('btn-open-menu-modal');
+    const btnCloseMenuModal = document.getElementById('btn-close-menu-modal');
+    const menuModal = document.getElementById('menu-modal');
+    const modalContentContainer = document.getElementById('modal-content-container');
+
+    // 1. Initial Load: Fetch Status & Menu
+    async function init() {
+      try {
+        const resStatus = await fetch('/api/status');
+        const statusData = await resStatus.json();
+        document.getElementById('header-model').textContent = statusData.model_name || 'gemini-3.6-flash';
+        
+        const resMenu = await fetch('/api/menu');
+        const menuData = await resMenu.json();
+        menuItems = menuData.items || [];
+        
+        const resVouchers = await fetch('/api/vouchers');
+        const vData = await resVouchers.json();
+        vouchersList = vData.happy_hour_vouchers || [];
+      } catch (err) {
+        console.error("Lỗi khi load dữ liệu ban đầu:", err);
+      }
+    }
+
+    // 2. Switch Mode (ReAct vs Baseline)
+    modeReactBtn.addEventListener('click', () => {
+      currentMode = 'react';
+      modeReactBtn.className = 'px-3 py-1 rounded-md font-semibold transition bg-emerald-600 text-white shadow';
+      modeBaselineBtn.className = 'px-3 py-1 rounded-md font-medium text-slate-400 hover:text-slate-200 transition';
+    });
+
+    modeBaselineBtn.addEventListener('click', () => {
+      currentMode = 'baseline';
+      modeBaselineBtn.className = 'px-3 py-1 rounded-md font-semibold transition bg-blue-600 text-white shadow';
+      modeReactBtn.className = 'px-3 py-1 rounded-md font-medium text-slate-400 hover:text-slate-200 transition';
+    });
+
+    // 3. Slider Loop Control
+    sliderMaxIterations.addEventListener('input', (e) => {
+      maxIterations = parseInt(e.target.value);
+      loopCountBadge.textContent = `${maxIterations} vòng lặp`;
+
+      if (maxIterations <= 2) {
+        loopWarning.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-400"></i> <span class="text-amber-400">Cực thấp: Dễ chạm trần Circuit Breaker sớm nếu cần tra cứu nhiều tool!</span>`;
+      } else if (maxIterations >= 10) {
+        loopWarning.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-red-400"></i> <span class="text-red-400">Cảnh báo: Tăng nguy cơ lãng phí token nếu Agent đi vòng lặp!</span>`;
+      } else {
+        loopWarning.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i> <span class="text-emerald-400">Cấu hình ${maxIterations} bước: Thích hợp cho ReAct Agent V2.</span>`;
+      }
+    });
+
+    // 4. Quick Prompt Hint Buttons
+    document.querySelectorAll('.btn-quick-prompt').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const promptText = btn.getAttribute('data-prompt');
+        inputQuery.value = promptText;
+        inputQuery.focus();
+      });
+    });
+
+    // 5. Send Chat Request
+    chatForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const query = inputQuery.value.trim();
+      if (!query) return;
+
+      // Disable Send Button & Show loading
+      btnSend.disabled = true;
+      btnSendText.textContent = "Đang chạy...";
+      btnSend.classList.add('animate-pulse');
+
+      // Clear previous traces if any
+      if (emptyState) emptyState.style.display = 'none';
+      traceContainer.innerHTML = `
+        <div class="flex items-center justify-center p-8 text-emerald-400 gap-3">
+          <i class="fa-solid fa-circle-notch fa-spin text-2xl"></i>
+          <span class="text-sm font-medium">ReAct Agent đang suy luận và tương tác MCP Server...</span>
+        </div>
+      `;
+      finalAnswerWrapper.classList.add('hidden');
+
+      try {
+        const startTime = performance.now();
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query: query,
+            mode: currentMode,
+            max_iterations: maxIterations
+          })
+        });
+
+        const data = await response.json();
+        renderExecutionResult(data);
+      } catch (err) {
+        traceContainer.innerHTML = `
+          <div class="p-4 bg-red-950/40 border border-red-800 text-red-300 rounded-lg text-xs">
+            <i class="fa-solid fa-circle-exclamation mr-1"></i> Lỗi khi thực thi: ${err.message}
+          </div>
+        `;
+      } finally {
+        btnSend.disabled = false;
+        btnSendText.textContent = "Gửi";
+        btnSend.classList.remove('animate-pulse');
+      }
+    });
+
+    // 6. Render Trace Logs & Outputs
+    function renderExecutionResult(data) {
+      traceContainer.innerHTML = '';
+      const logs = data.trace_logs || [];
+
+      // Update Top Badges
+      badgeTotalSteps.textContent = `${logs.length} bước`;
+      badgeTotalLatency.textContent = `${data.total_latency_ms || data.latency_ms || 0} ms`;
+
+      // Update Metrics
+      const usage = data.usage_summary || data.usage || {};
+      const cost = data.cost_summary || data.cost || {};
+
+      metricPromptTokens.textContent = usage.prompt_tokens?.toLocaleString() || '0';
+      metricCompletionTokens.textContent = usage.completion_tokens?.toLocaleString() || '0';
+      metricCostUsd.textContent = `$${(cost.usd || 0).toFixed(5)}`;
+      metricCostVnd.textContent = `${(cost.vnd || 0).toFixed(2)} đ`;
+
+      // Budget Bar (500đ limit safe ceiling)
+      const vndVal = cost.vnd || 0;
+      const pct = Math.min(100, Math.round((vndVal / 500) * 100));
+      budgetPercent.textContent = `${pct}%`;
+      budgetBar.style.width = `${pct}%`;
+      if (pct > 80) {
+        budgetBar.className = "bg-amber-500 h-full transition-all duration-500";
+      } else {
+        budgetBar.className = "bg-emerald-500 h-full transition-all duration-500";
+      }
+
+      // Render Each Step in Timeline
+      if (logs.length === 0 && data.mode === 'baseline') {
+        traceContainer.innerHTML = `
+          <div class="p-4 bg-slate-950 border border-slate-800 rounded-xl">
+            <div class="flex items-center gap-2 text-xs font-semibold text-blue-400 mb-2">
+              <i class="fa-solid fa-comment-dots"></i>
+              <span>CHATBOT BASELINE (KHÔNG GỌI TOOL / CẤP 2)</span>
+            </div>
+            <p class="text-xs text-slate-300">Chatbot phản hồi thuần văn bản dựa trên LLM mà không kết nối cơ sở dữ liệu MCP Server thời gian thực.</p>
+          </div>
+        `;
+      } else {
+        logs.forEach((log, idx) => {
+          const stepDiv = document.createElement('div');
+          stepDiv.className = "timeline-item relative pl-8 pb-4";
+
+          // Icon badge
+          let badgeIcon = '<i class="fa-solid fa-gear text-emerald-400"></i>';
+          let borderStyle = "border-slate-800";
+          let actionLabel = "TOOL_EXECUTION";
+
+          if (log.action_type === 'FINAL_ANSWER') {
+            badgeIcon = '<i class="fa-solid fa-flag text-purple-400"></i>';
+            borderStyle = "border-purple-900/60";
+            actionLabel = "FINAL_ANSWER";
+          } else if (log.is_duplicate_blocked) {
+            badgeIcon = '<i class="fa-solid fa-shield-halved text-amber-400"></i>';
+            borderStyle = "border-amber-900/60";
+            actionLabel = "DUPLICATE_BLOCKED";
+          }
+
+          let actionHtml = '';
+          if (log.action_type === 'TOOL_EXECUTION') {
+            actionHtml = `
+              <div class="mt-2 bg-slate-950 rounded-lg p-2.5 border border-slate-800/80">
+                <div class="flex items-center justify-between text-[11px] mb-1">
+                  <span class="font-mono text-emerald-400 font-bold">🛠️ Action: ${log.tool_name}</span>
+                  <span class="text-slate-500 text-[10px]">MCP Tool</span>
+                </div>
+                <pre class="text-[11px] font-mono text-slate-300 overflow-x-auto p-1 bg-slate-900/60 rounded"><code>${JSON.stringify(log.arguments || {}, null, 2)}</code></pre>
+              </div>
+
+              <!-- Observation -->
+              <div class="mt-2 bg-slate-950 rounded-lg p-2.5 border border-slate-800/80">
+                <div class="flex items-center justify-between text-[11px] mb-1">
+                  <span class="font-mono text-teal-400 font-bold">👁️ Observation (MCP JSON-RPC)</span>
+                  <span class="text-emerald-500 text-[10px] font-semibold">${log.observation?.status || 'OK'}</span>
+                </div>
+                <pre class="text-[11px] font-mono text-slate-300 overflow-x-auto p-1 bg-slate-900/60 rounded max-h-48"><code>${JSON.stringify(log.observation || {}, null, 2)}</code></pre>
+              </div>
+            `;
+          }
+
+          let duplicateAlertHtml = '';
+          if (log.is_duplicate_blocked) {
+            duplicateAlertHtml = `
+              <div class="mt-2 p-2 rounded bg-amber-950/40 border border-amber-800/80 text-[11px] text-amber-300 flex items-center gap-2">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>[SAFEGUARD TRIGGERED]: Duplicate tool call detected & blocked!</span>
+              </div>
+            `;
+          }
+
+          let circuitBreakerHtml = '';
+          if (log.circuit_breaker_triggered) {
+            circuitBreakerHtml = `
+              <div class="mt-2 p-2 rounded bg-red-950/40 border border-red-800/80 text-[11px] text-red-300 flex items-center gap-2">
+                <i class="fa-solid fa-hand"></i>
+                <span>[CIRCUIT BREAKER]: Đã chạm trần ${maxIterations} vòng lặp tối đa!</span>
+              </div>
+            `;
+          }
+
+          stepDiv.innerHTML = `
+            <div class="timeline-line"></div>
+            <!-- Node Icon -->
+            <div class="absolute left-0 top-0 w-8 h-8 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center text-xs shadow">
+              ${badgeIcon}
+            </div>
+
+            <!-- Content Card -->
+            <div class="bg-slate-950/80 border ${borderStyle} rounded-xl p-3.5 shadow-sm">
+              <div class="flex items-center justify-between gap-2 mb-2">
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-slate-800 text-slate-300">
+                    BƯỚC ${log.step}
+                  </span>
+                  <span class="text-xs font-semibold text-slate-300">${actionLabel}</span>
+                </div>
+                <div class="flex items-center gap-2 text-[10px] font-mono text-slate-400">
+                  <span title="Thời gian trễ">${log.latency_ms || 0} ms</span>
+                  <span>•</span>
+                  <span class="text-amber-400" title="Chi phí bước này">${log.cost?.vnd || 0} đ</span>
+                </div>
+              </div>
+
+              <!-- Thought -->
+              ${log.thought ? `
+                <div class="text-xs text-slate-300 italic bg-slate-900/80 p-2 rounded-lg border-l-2 border-emerald-500 mb-2">
+                  <span class="font-semibold text-emerald-400 not-italic">🧠 Thought:</span> ${log.thought}
+                </div>
+              ` : ''}
+
+              ${actionHtml}
+              ${duplicateAlertHtml}
+              ${circuitBreakerHtml}
+            </div>
+          `;
+
+          traceContainer.appendChild(stepDiv);
+        });
+      }
+
+      // Syntax highlight
+      hljs.highlightAll();
+
+      // Render Final Answer
+      if (data.final_answer) {
+        finalAnswerWrapper.classList.remove('hidden');
+        finalAnswerContent.innerHTML = marked.parse(data.final_answer);
+        finalAnswerWrapper.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    // 7. Clear Trace
+    btnClearTrace.addEventListener('click', () => {
+      traceContainer.innerHTML = '';
+      if (emptyState) traceContainer.appendChild(emptyState);
+      finalAnswerWrapper.classList.add('hidden');
+      metricPromptTokens.textContent = '0';
+      metricCompletionTokens.textContent = '0';
+      metricCostUsd.textContent = '$0.00000';
+      metricCostVnd.textContent = '0.00 đ';
+      budgetBar.style.width = '0%';
+      budgetPercent.textContent = '0%';
+      badgeTotalSteps.textContent = '0 bước';
+      badgeTotalLatency.textContent = '0 ms';
+    });
+
+    // 8. Copy Final Answer
+    btnCopyAnswer.addEventListener('click', () => {
+      const text = finalAnswerContent.innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        btnCopyAnswer.innerHTML = '<i class="fa-solid fa-check text-emerald-400"></i> Đã chép!';
+        setTimeout(() => {
+          btnCopyAnswer.innerHTML = '<i class="fa-regular fa-copy"></i> <span>Sao chép</span>';
+        }, 2000);
+      });
+    });
+
+    // 9. Reset Input
+    btnResetInput.addEventListener('click', () => {
+      inputQuery.value = '';
+      inputQuery.focus();
+    });
+
+    // 10. Modal Logic: Explore Menu & Vouchers
+    btnOpenMenuModal.addEventListener('click', () => {
+      menuModal.classList.remove('hidden');
+      renderMenuCards('all');
+    });
+
+    btnCloseMenuModal.addEventListener('click', () => {
+      menuModal.classList.add('hidden');
+    });
+
+    document.querySelectorAll('.btn-menu-tab').forEach(tab => {
+      tab.addEventListener('click', (e) => {
+        document.querySelectorAll('.btn-menu-tab').forEach(t => {
+          t.className = "btn-menu-tab px-3 py-1 rounded-md bg-slate-800 text-slate-300 hover:bg-slate-700";
+        });
+        tab.className = "btn-menu-tab px-3 py-1 rounded-md bg-emerald-600 text-white font-medium";
+        const filter = tab.getAttribute('data-filter');
+        renderMenuCards(filter);
+      });
+    });
+
+    function renderMenuCards(filter) {
+      modalContentContainer.innerHTML = '';
+
+      if (filter === 'vouchers') {
+        vouchersList.forEach(v => {
+          const card = document.createElement('div');
+          card.className = "bg-slate-950 p-4 rounded-xl border border-amber-900/60 flex flex-col justify-between";
+          card.innerHTML = `
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="px-2 py-0.5 rounded font-mono font-bold text-xs bg-amber-950 text-amber-300 border border-amber-700">
+                  ${v.voucher_code}
+                </span>
+                <span class="text-xs font-semibold text-emerald-400">- ${v.discount_amount.toLocaleString()} VNĐ</span>
+              </div>
+              <h4 class="text-sm font-semibold text-slate-200">${v.name}</h4>
+              <p class="text-xs text-slate-400 mt-1">${v.description}</p>
+            </div>
+            <div class="mt-3 pt-2 border-t border-slate-800 flex justify-between text-[11px] text-slate-500">
+              <span>Khung giờ: <strong class="text-slate-300">${v.time_slot}</strong></span>
+              <span>Đơn tối thiểu: ${v.min_order_value.toLocaleString()}đ</span>
+            </div>
+          `;
+          modalContentContainer.appendChild(card);
+        });
+        return;
+      }
+
+      const filtered = menuItems.filter(item => {
+        if (filter === 'all') return true;
+        return item.category.toLowerCase().includes(filter.toLowerCase());
+      });
+
+      if (filtered.length === 0) {
+        modalContentContainer.innerHTML = `<div class="col-span-2 text-center py-8 text-slate-500 text-xs">Không tìm thấy món ăn nào trong danh mục này.</div>`;
+        return;
+      }
+
+      filtered.forEach(item => {
+        const card = document.createElement('div');
+        card.className = "bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col justify-between hover:border-slate-700 transition";
+        card.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <span class="font-mono text-xs text-emerald-400 font-semibold">${item.set_code}</span>
+              <span class="text-xs font-bold text-slate-100">${item.price.toLocaleString()} VNĐ</span>
+            </div>
+            <h4 class="text-sm font-bold text-slate-100">${item.name}</h4>
+            <div class="text-[11px] text-teal-300 mt-0.5">${item.category}</div>
+            
+            <!-- Macros -->
+            <div class="grid grid-cols-4 gap-1 mt-2.5 bg-slate-900/80 p-2 rounded-lg text-center text-[10px]">
+              <div><span class="text-slate-400">Calo</span><div class="font-mono font-bold text-amber-400">${item.calories}</div></div>
+              <div><span class="text-slate-400">Đạm</span><div class="font-mono font-bold text-blue-400">${item.macros?.protein_g || 0}g</div></div>
+              <div><span class="text-slate-400">Carb</span><div class="font-mono font-bold text-emerald-400">${item.macros?.carb_g || 0}g</div></div>
+              <div><span class="text-slate-400">Béo</span><div class="font-mono font-bold text-purple-400">${item.macros?.fat_g || 0}g</div></div>
+            </div>
+
+            <!-- Allergen Warning -->
+            <div class="mt-2 text-[10px] text-slate-400 bg-slate-900/40 p-1.5 rounded">
+              <i class="fa-solid fa-shield-virus text-amber-400 mr-1"></i> ${item.allergen_warning}
+            </div>
+          </div>
+
+          <div class="mt-3 pt-2 border-t border-slate-900 flex justify-between items-center">
+            <span class="text-[10px] text-emerald-400 flex items-center gap-1">
+              <i class="fa-solid fa-circle-check"></i> Còn hàng
+            </span>
+            <button class="px-2 py-1 rounded bg-slate-800 hover:bg-emerald-600 text-[10px] font-semibold text-slate-200 hover:text-white transition"
+                    onclick="selectSetForQuery('${item.set_code}')">
+              Tra cứu set này
+            </button>
+          </div>
+        `;
+        modalContentContainer.appendChild(card);
+      });
+    }
+
+    window.selectSetForQuery = function(setCode) {
+      menuModal.classList.add('hidden');
+      inputQuery.value = `Cho tôi tra cứu thông tin chi tiết và thành phần dinh dưỡng của set '${setCode}'.`;
+      inputQuery.focus();
+    };
+
+    // Run on start
+    init();
+  </script>
+</body>
+</html>

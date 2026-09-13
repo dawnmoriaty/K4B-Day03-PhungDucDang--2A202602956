@@ -1,10 +1,19 @@
 {
   "happy_hour_vouchers": [
     {
+      "voucher_code": "MORNING10",
+      "name": "Chào Buổi Sáng Tươi Tỉnh",
+      "time_slot": "07:00 - 09:30",
+      "keywords": ["7:", "07:", "8:", "08:", "9:00", "09:00", "09:15", "09:30", "sáng", "bữa sáng"],
+      "discount_amount": 10000,
+      "min_order_value": 45000,
+      "description": "Giảm 10.000 VNĐ cho các set ăn sáng lành mạnh nạp năng lượng ngày mới (07:00 - 09:30)."
+    },
+    {
       "voucher_code": "LUNCH15",
       "name": "Giờ Vàng Bữa Trưa",
       "time_slot": "11:00 - 13:30",
-      "keywords": ["11:", "12:", "13:00", "13:15", "13:30", "trưa"],
+      "keywords": ["11:", "12:", "13:00", "13:15", "13:30", "trưa", "bữa trưa"],
       "discount_amount": 15000,
       "min_order_value": 0,
       "description": "Giảm ngay 15.000 VNĐ cho mọi đơn hàng giao trong khung giờ trưa từ 11:00 đến 13:30."
@@ -13,39 +22,48 @@
       "voucher_code": "DINNER20",
       "name": "Giờ Vàng Bữa Tối",
       "time_slot": "17:30 - 19:30",
-      "keywords": ["17:30", "18:", "19:00", "19:15", "19:30", "tối"],
+      "keywords": ["17:30", "18:", "19:00", "19:15", "19:30", "tối", "bữa tối"],
       "discount_amount": 20000,
       "min_order_value": 0,
       "description": "Giảm ngay 20.000 VNĐ cho mọi đơn hàng giao trong khung giờ tối từ 17:30 đến 19:30."
     },
     {
       "voucher_code": "HEALTHY10",
-      "name": "Khách Hàng Mới",
+      "name": "Khách Hàng Mới / Healthy Lifestyle",
       "time_slot": "Toàn thời gian",
-      "keywords": ["all", "mới", "welcome"],
+      "keywords": ["all", "mới", "welcome", "healthy"],
       "discount_amount": 10000,
       "min_order_value": 70000,
       "description": "Giảm 10.000 VNĐ cho đơn từ 70.000 VNĐ áp dụng toàn bộ các khung giờ."
+    },
+    {
+      "voucher_code": "COMBO50",
+      "name": "Ưu Đãi Combo Đại Gia Đình",
+      "time_slot": "Toàn thời gian",
+      "keywords": ["combo", "gia đình", "family", "nhóm"],
+      "discount_amount": 50000,
+      "min_order_value": 250000,
+      "description": "Giảm ngay 50.000 VNĐ cho combo gia đình 4 người hoặc đơn đặt bàn đông người trên 250.000 VNĐ."
     }
   ],
   "allergen_rules": {
     "seafood": {
-      "keywords": ["hải sản", "hai san", "tôm", "tom", "cua", "mực", "muc", "cá", "ca", "seafood", "shrimp", "fish"],
-      "blocked_sets": ["SET-SEAFOOD-01", "SET-SEAFOOD-02", "SET-CLEAN-02"],
-      "recommended_safe_sets": ["SET-CLEAN-01", "SET-VEGAN-01", "SET-VEGAN-02", "SET-BEEF-01"],
-      "warning": "CẢNH BÁO DỊ ỨNG: Khách hàng dị ứng Hải sản. TUYỆT ĐỐI LOẠI BỎ 'SET-SEAFOOD-01', 'SET-SEAFOOD-02', 'SET-CLEAN-02'. Khuyến nghị chọn 'SET-CLEAN-01' (Eat Clean giảm cân), 'SET-VEGAN-01' (Chay) hoặc 'SET-BEEF-01' (Bò Úc)."
+      "keywords": ["hải sản", "hai san", "tôm", "tom", "cua", "mực", "muc", "cá", "ca", "sò điệp", "seafood", "shrimp", "fish"],
+      "blocked_sets": ["SET-SEAFOOD-01", "SET-SEAFOOD-02", "SET-SEAFOOD-03", "SET-CLEAN-02", "SET-CLEAN-04"],
+      "recommended_safe_sets": ["SET-CLEAN-01", "SET-CLEAN-03", "SET-VEGAN-01", "SET-VEGAN-02", "SET-VEGAN-03", "SET-BEEF-01", "SET-BEEF-02"],
+      "warning": "CẢNH BÁO DỊ ỨNG: Khách hàng dị ứng Hải sản. TUYỆT ĐỐI LOẠI BỎ 'SET-SEAFOOD-01', 'SET-SEAFOOD-02', 'SET-SEAFOOD-03', 'SET-CLEAN-02', 'SET-CLEAN-04'. Khuyến nghị chọn 'SET-CLEAN-01' (Eat Clean gà quinoa), 'SET-CLEAN-03' (Gà xé khoai tím) hoặc 'SET-BEEF-01' (Bò Úc)."
     },
     "dairy": {
-      "keywords": ["sữa", "phô mai", "cheese", "dairy", "bơ sữa"],
+      "keywords": ["sữa", "phô mai", "cheese", "dairy", "bơ sữa", "lactose"],
       "blocked_sets": ["SET-KETO-01", "SET-SNACK-01"],
-      "recommended_safe_sets": ["SET-CLEAN-01", "SET-VEGAN-01", "SET-VEGAN-02"],
-      "warning": "CẢNH BÁO DỊ ỨNG: Khách hàng dị ứng Sữa/Phô mai. Tránh các set 'SET-KETO-01' và 'SET-SNACK-01'."
+      "recommended_safe_sets": ["SET-CLEAN-01", "SET-CLEAN-03", "SET-VEGAN-01", "SET-VEGAN-02", "SET-BREAKFAST-02"],
+      "warning": "CẢNH BÁO DỊ ỨNG: Khách hàng dị ứng Sữa/Lactose. Tránh các set 'SET-KETO-01' và 'SET-SNACK-01'. Gợi ý dùng 'SET-BREAKFAST-02' (Yến mạch sữa hạnh nhân thực vật) hoặc các set Chay."
     },
     "egg": {
       "keywords": ["trứng", "egg"],
-      "blocked_sets": ["SET-KETO-01", "SET-KETO-02"],
-      "recommended_safe_sets": ["SET-CLEAN-01", "SET-VEGAN-01", "SET-VEGAN-02", "SET-BEEF-01"],
-      "warning": "CẢNH BÁO DỊ ỨNG: Khách hàng dị ứng Trứng. Tránh các set Keto chứa trứng."
+      "blocked_sets": ["SET-KETO-01", "SET-KETO-02", "SET-BREAKFAST-01"],
+      "recommended_safe_sets": ["SET-CLEAN-01", "SET-CLEAN-03", "SET-VEGAN-01", "SET-BEEF-01"],
+      "warning": "CẢNH BÁO DỊ ỨNG: Khách hàng dị ứng Trứng. Tránh các set Keto chứa trứng và set Ăn sáng bánh mì trứng ốp la."
     }
   }
 }

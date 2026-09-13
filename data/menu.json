@@ -41,6 +41,40 @@
       "status": "Còn hàng"
     },
     {
+      "set_code": "SET-CLEAN-03",
+      "name": "Set Eat Clean Gà Xé Phay Trộn Rau Mầm & Khoai Lang Tím",
+      "category": "Eat Clean / Ít Calo",
+      "price": 70000,
+      "calories": 440,
+      "macros": {
+        "protein_g": 36,
+        "carb_g": 45,
+        "fat_g": 7
+      },
+      "ingredients": ["Thịt ức gà ta xé phay", "Rau mầm củ cải đỏ", "Khoai lang tím Nhật hấp", "Sốt dấm táo hữu cơ"],
+      "allergens": [],
+      "allergen_warning": "Không chứa hải sản. Không sữa. Rất thanh mát, giàu chất xơ hòa tan.",
+      "suitable_for": ["Giảm cân cấp tốc", "Eat Clean", "Bữa trưa nhẹ nhàng"],
+      "status": "Còn hàng"
+    },
+    {
+      "set_code": "SET-CLEAN-04",
+      "name": "Set Cá Basa Phi Lê Nướng Tiêu Chanh & Salad Hy Lạp",
+      "category": "Eat Clean / Tiết Kiệm",
+      "price": 68000,
+      "calories": 460,
+      "macros": {
+        "protein_g": 35,
+        "carb_g": 34,
+        "fat_g": 12
+      },
+      "ingredients": ["Cá basa phi lê xuất khẩu", "Salad dưa leo cà chua bi", "Cơm gạo lứt huyết rồng", "Sốt tiêu chanh tươi"],
+      "allergens": ["Cá"],
+      "allergen_warning": "CẢNH BÁO DỊ ỨNG: Chứa cá nước ngọt phi lê.",
+      "suitable_for": ["Eat Clean giá mềm", "Bổ sung đạm lành tính"],
+      "status": "Còn hàng"
+    },
+    {
       "set_code": "SET-VEGAN-01",
       "name": "Set Chay Thanh Đạm Đậu Hũ Non Sốt Nấm Đùi Gà",
       "category": "Thuần Chay / Vegan",
@@ -66,12 +100,46 @@
       "macros": {
         "protein_g": 18,
         "carb_g": 58,
-        "fat_g": 8
+        "fat_g": 11
       },
-      "ingredients": ["Cà tím Nhật nướng sốt Miso", "Cơm ngũ hạt (hạt kê, yến mạch, đậu đen)", "Bí ngòi áp chảo", "Canh nấm đông cô"],
-      "allergens": ["Đậu nành (trong sốt miso)"],
+      "ingredients": ["Cà tím Đà Lạt nướng xém", "Sốt Miso lên men Nhật Bản", "Cơm ngũ hạt (kê, yến mạch, đậu đen, gạo lứt)", "Nấm hương xào hạt dẻ"],
+      "allergens": ["Đậu nành"],
       "allergen_warning": "Không chứa hải sản. Chứa đậu nành trong sốt miso.",
-      "suitable_for": ["Ăn chay", "Dưỡng sinh", "Giảm huyết áp"],
+      "suitable_for": ["Ăn chay trường", "Chế độ dưỡng sinh Ohsawa"],
+      "status": "Còn hàng"
+    },
+    {
+      "set_code": "SET-VEGAN-03",
+      "name": "Set Chay Cà Rốt Củ Dền Hầm Đậu Đỏ & Nấm Đông Cô",
+      "category": "Thuần Chay / Bổ Máu",
+      "price": 62000,
+      "calories": 390,
+      "macros": {
+        "protein_g": 20,
+        "carb_g": 62,
+        "fat_g": 6
+      },
+      "ingredients": ["Củ dền đỏ Đà Lạt", "Đậu đỏ hữu cơ", "Nấm đông cô khô hầm nhừ", "Gạo lứt huyết rồng", "Canh cải thìa bắp ngọt"],
+      "allergens": [],
+      "allergen_warning": "Thuần chay 100%. Không dầu mỡ, giàu sắt và khoáng chất tự nhiên.",
+      "suitable_for": ["Người thiếu máu nhẹ", "Phụ nữ sau sinh ăn chay", "Detox nhẹ nhàng"],
+      "status": "Còn hàng"
+    },
+    {
+      "set_code": "SET-VEGAN-04",
+      "name": "Set Chay Bún Gạo Lứt Chả Nấm & Nem Rau Củ Chiên Không Dầu",
+      "category": "Thuần Chay / Đổi Vị",
+      "price": 68000,
+      "calories": 450,
+      "macros": {
+        "protein_g": 21,
+        "carb_g": 64,
+        "fat_g": 9
+      },
+      "ingredients": ["Bún gạo lứt tươi", "Chả nấm hương mộc nhĩ thủ công", "Nem cuốn rau củ nướng air-fryer", "Nước mắm chay chua ngọt từ cốt dứa"],
+      "allergens": [],
+      "allergen_warning": "Thuần chay 100%. Không phẩm màu, không chất bảo quản.",
+      "suitable_for": ["Ăn chay thích đổi vị món nước/bún", "Eat clean chay"],
       "status": "Còn hàng"
     },
     {
@@ -85,10 +153,10 @@
         "carb_g": 45,
         "fat_g": 11
       },
-      "ingredients": ["Tôm sú tươi bóc nõn (6 con)", "Măng tây xanh", "Khoai lang mật nướng", "Sốt bơ tỏi lá thyme"],
-      "allergens": ["Tôm sú", "Hải sản"],
+      "ingredients": ["Tôm sú tươi loại 1", "Măng tây xanh Đà Lạt", "Khoai lang mật nướng than", "Sốt tỏi ớt chanh sả"],
+      "allergens": ["Tôm", "Hải sản"],
       "allergen_warning": "CẢNH BÁO DỊ ỨNG: Chứa Tôm sú (Hải sản). Người dị ứng hải sản TUYỆT ĐỐI KHÔNG DÙNG!",
-      "suitable_for": ["Giàu Canxi & Đạm", "Người thích hải sản"],
+      "suitable_for": ["Người thích hải sản giàu đạm", "Tăng cường kẽm và sức đề kháng"],
       "status": "Còn hàng"
     },
     {
@@ -100,12 +168,29 @@
       "macros": {
         "protein_g": 36,
         "carb_g": 40,
+        "fat_g": 10
+      },
+      "ingredients": ["Mực ống tươi Côn Đảo", "Sa tế tôm dầu hào", "Salad bắp cải tím cà rốt ớt chuông", "Cơm gạo lứt sấy phồng"],
+      "allergens": ["Mực", "Hải sản", "Hàu"],
+      "allergen_warning": "CẢNH BÁO DỊ ỨNG: Chứa Mực ống (Hải sản). Người dị ứng hải sản TUYỆT ĐỐI KHÔNG DÙNG!",
+      "suitable_for": ["Người thích vị cay nhẹ, đậm đà", "Bữa tối ấm cúng"],
+      "status": "Còn hàng"
+    },
+    {
+      "set_code": "SET-SEAFOOD-03",
+      "name": "Set Cơm Trộn Bát Bửu Sò Điệp Nhật & Tảo Biển Wakame",
+      "category": "Hải sản / Thượng Hạng",
+      "price": 120000,
+      "calories": 520,
+      "macros": {
+        "protein_g": 44,
+        "carb_g": 48,
         "fat_g": 12
       },
-      "ingredients": ["Mực ống tươi nướng", "Bắp ngọt nướng", "Salad bắp cải tím xà lách", "Cơm gạo lứt"],
-      "allergens": ["Mực", "Hải sản"],
-      "allergen_warning": "CẢNH BÁO DỊ ỨNG: Chứa Mực ống (Hải sản). Người dị ứng hải sản TUYỆT ĐỐI KHÔNG DÙNG!",
-      "suitable_for": ["Người thích vị đậm đà", "Giàu đạm ít béo"],
+      "ingredients": ["Cồi sò điệp Hokkaido áp chảo", "Tảo biển Wakame trộn mè", "Cơm ngũ cốc", "Trứng cá chuồn tobiko", "Sốt mè rang đậu tương"],
+      "allergens": ["Sò điệp (Nhuyễn thể)", "Hải sản", "Trứng cá", "Đậu nành"],
+      "allergen_warning": "CẢNH BÁO DỊ ỨNG: Chứa Sò điệp, nhuyễn thể và hải sản. Người dị ứng TUYỆT ĐỐI KHÔNG DÙNG!",
+      "suitable_for": ["Bữa ăn cao cấp", "Giàu i-ốt và đạm sinh học"],
       "status": "Còn hàng"
     },
     {
@@ -115,14 +200,31 @@
       "price": 85000,
       "calories": 560,
       "macros": {
-        "protein_g": 45,
-        "carb_g": 40,
-        "fat_g": 16
+        "protein_g": 48,
+        "carb_g": 35,
+        "fat_g": 14
       },
-      "ingredients": ["Thăn bò Úc thái lát áp chảo", "Khoai tây nghiền bơ nhạt", "Đậu cove luộc", "Sốt tiêu đen"],
+      "ingredients": ["Thăn ngoại bò Úc tươi", "Khoai tây nghiền ít bơ", "Đậu cove Pháp xào tỏi", "Sốt tiêu đen Phú Quốc"],
       "allergens": [],
       "allergen_warning": "Không chứa hải sản. Giàu sắt và protein cho người tập gym, tăng cơ bắp.",
-      "suitable_for": ["Tập thể hình", "Tăng cân lành mạnh", "Bổ sung sắt"],
+      "suitable_for": ["Tập Gym / Thể hình", "Phục hồi cơ bắp", "Bữa ăn giàu năng lượng"],
+      "status": "Còn hàng"
+    },
+    {
+      "set_code": "SET-BEEF-02",
+      "name": "Set Bò Hầm Tiêu Xanh Rượu Vang & Bánh Mì Nguyên Cám",
+      "category": "Tăng cơ / Đậm Đà",
+      "price": 92000,
+      "calories": 580,
+      "macros": {
+        "protein_g": 46,
+        "carb_g": 44,
+        "fat_g": 16
+      },
+      "ingredients": ["Bắp bò hoa hầm tiêu xanh", "Rượu vang đỏ Đà Lạt", "Khoai tây cà rốt hầm", "Bánh mì đen nguyên cám lúa mạch"],
+      "allergens": ["Gluten (Lúa mì)"],
+      "allergen_warning": "Không chứa hải sản. Chứa gluten trong bánh mì nguyên cám.",
+      "suitable_for": ["Tăng cân cơ nạc", "Bữa tối ấm cúng giàu dinh dưỡng"],
       "status": "Còn hàng"
     },
     {
@@ -132,14 +234,14 @@
       "price": 85000,
       "calories": 620,
       "macros": {
-        "protein_g": 48,
+        "protein_g": 45,
         "carb_g": 6,
-        "fat_g": 38
+        "fat_g": 42
       },
-      "ingredients": ["Đùi gà góc tư rút xương", "Phô mai Mozzarella đút lò", "Salad rau rocket sốt dầu dấm", "Trứng ốp la"],
-      "allergens": ["Phô mai (Sữa)", "Trứng"],
+      "ingredients": ["Đùi gà rút xương tươi nướng da giòn", "Phô mai Mozzarella chảy", "Salad rau rocket sốt dầu oliu extra virgin"],
+      "allergens": ["Sữa (Phô mai)"],
       "allergen_warning": "Không chứa hải sản. CẢNH BÁO DỊ ỨNG: Chứa sản phẩm từ sữa và trứng.",
-      "suitable_for": ["Ăn kiêng Keto", "Cắt giảm Carb", "Tập gym"],
+      "suitable_for": ["Ăn kiêng Keto", "Low-carb cắt đường", "Siết mỡ bụng"],
       "status": "Còn hàng"
     },
     {
@@ -160,6 +262,57 @@
       "status": "Còn hàng"
     },
     {
+      "set_code": "SET-KETO-03",
+      "name": "Set Keto Bò Cuộn Nấm Kim Châm & Salad Dầu Giấm Hạnh Nhân",
+      "category": "Keto / Giàu Đạm",
+      "price": 95000,
+      "calories": 610,
+      "macros": {
+        "protein_g": 44,
+        "carb_g": 7,
+        "fat_g": 41
+      },
+      "ingredients": ["Ba chỉ bò Mỹ thái lát cuộn nấm kim châm", "Sốt bơ tỏi keto", "Salad xà lách mỡ dầu giấm táo", "Hạt óc chó vụn"],
+      "allergens": ["Hạt cây (Óc chó)"],
+      "allergen_warning": "Không chứa hải sản. CẢNH BÁO DỊ ỨNG: Chứa hạt óc chó.",
+      "suitable_for": ["Keto", "Ít carb tuyệt đối", "Giàu béo chưa bão hòa"],
+      "status": "Còn hàng"
+    },
+    {
+      "set_code": "SET-BREAKFAST-01",
+      "name": "Set Bữa Sáng Bánh Mì Đen Quả Bơ & Trứng Ốp La Thảo Mộc",
+      "category": "Bữa Sáng / Healthy Breakfast",
+      "price": 48000,
+      "calories": 360,
+      "macros": {
+        "protein_g": 16,
+        "carb_g": 28,
+        "fat_g": 14
+      },
+      "ingredients": ["2 lát bánh mì đen lúa mạch", "1/2 quả bơ sáp nghiền", "2 trứng gà ta ốp la lòng đào", "Hạt tiêu đen và hương thảo"],
+      "allergens": ["Trứng", "Gluten"],
+      "allergen_warning": "Không chứa hải sản. Chứa trứng gà và gluten lúa mì.",
+      "suitable_for": ["Bữa sáng nhanh gọn", "Khởi đầu ngày mới tỉnh táo", "Healthy breakfast"],
+      "status": "Còn hàng"
+    },
+    {
+      "set_code": "SET-BREAKFAST-02",
+      "name": "Set Yến Mạch Ngâm Sữa Hạt Hạnh Nhân & Việt Quất Tươi",
+      "category": "Bữa Sáng / Năng Lượng Sạch",
+      "price": 52000,
+      "calories": 340,
+      "macros": {
+        "protein_g": 14,
+        "carb_g": 48,
+        "fat_g": 8
+      },
+      "ingredients": ["Yến mạch cán dẹt nguyên cám Úc", "Sữa hạt hạnh nhân không đường", "Việt quất tươi Đà Lạt", "Hạt chia", "Mật ong hoa bạc hà"],
+      "allergens": ["Hạnh nhân (Hạt cây)"],
+      "allergen_warning": "Không chứa sữa bò, không lactose. Chứa hạnh nhân.",
+      "suitable_for": ["Người không dung nạp lactose", "Bữa sáng thanh nhẹ", "Ăn trước khi tập nhẹ"],
+      "status": "Còn hàng"
+    },
+    {
       "set_code": "SET-SNACK-01",
       "name": "Set Detox Nước Ép Cần Tây Táo Xanh & Sữa Chua Hy Lạp Hạt Chia",
       "category": "Tráng miệng / Detox",
@@ -174,6 +327,46 @@
       "allergens": ["Sữa chua (Sữa)"],
       "allergen_warning": "Không chứa hải sản. Chứa sữa trong sữa chua Hy Lạp.",
       "suitable_for": ["Detox đường ruột", "Đẹp da", "Ăn nhẹ buổi xế chiều"],
+      "status": "Còn hàng"
+    },
+    {
+      "set_code": "SET-SNACK-02",
+      "name": "Set Nước Ép Cam Cà Rốt Gừng & Bánh Quy Hạt Yến Mạch",
+      "category": "Tráng miệng / Tăng Đề Kháng",
+      "price": 40000,
+      "calories": 210,
+      "macros": {
+        "protein_g": 5,
+        "carb_g": 38,
+        "fat_g": 3
+      },
+      "ingredients": ["Cam sành vắt tươi", "Cà rốt ép chậm", "Gừng sẻ ấm bụng", "2 bánh quy yến mạch ăn kiêng không đường"],
+      "allergens": ["Gluten"],
+      "allergen_warning": "Thuần thực vật. Chứa gluten trong bánh quy yến mạch.",
+      "suitable_for": ["Tăng đề kháng mùa lạnh", "Xế chiều văn phòng"],
+      "status": "Còn hàng"
+    },
+    {
+      "set_code": "SET-FAMILY-01",
+      "name": "Combo Đại Gia Đình Healthy 4 Suất Thập Cẩm",
+      "category": "Set Gia Đình / Nhóm 4 Người",
+      "price": 290000,
+      "calories": 1950,
+      "macros": {
+        "protein_g": 160,
+        "carb_g": 180,
+        "fat_g": 48
+      },
+      "ingredients": [
+        "1x Set Thăn bò Úc khoai tây nghiền",
+        "1x Set Ức gà nướng thảo mộc quinoa",
+        "1x Set Chay đậu hũ non nấm đùi gà",
+        "1x Set Cá basa nướng tiêu chanh",
+        "4x Chai nước detox táo cần tây tặng kèm"
+      ],
+      "allergens": ["Cá"],
+      "allergen_warning": "Combo phong phú có món chứa cá. An toàn cho người kiêng tôm/mực/sò.",
+      "suitable_for": ["Bữa ăn gia đình 4 người", "Nhóm bạn văn phòng trưa/tối", "Tiết kiệm 20% so với gọi lẻ"],
       "status": "Còn hàng"
     }
   ]

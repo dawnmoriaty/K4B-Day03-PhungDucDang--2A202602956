@@ -54,11 +54,39 @@ def save_waterfall_trace(trace_data: list):
     print(f"📊 [OBSERVABILITY]: Đã lưu {len(trace_data)} sự kiện Waterfall Trace tại '{trace_path}'!")
 
 
-def run_baseline_chatbot(user_query: str, provider):
+def calculate_token_cost(usage: dict) -> dict:
+    """Tính toán chi phí gọi LLM theo biểu giá Gemini Flash / OpenAI ($0.075 input / $0.30 output per 1M tokens)"""
+    p_tokens = usage.get("prompt_tokens", 0)
+    c_tokens = usage.get("completion_tokens", 0)
+    cost_usd = (p_tokens * 0.075 + c_tokens * 0.30) / 1_000_000
+    cost_vnd = cost_usd * 25400  # Tỷ giá 1 USD = 25,400 VNĐ
+    return {
+        "usd": round(cost_usd, 7),
+        "vnd": round(cost_vnd, 2)
+    }
+
+
+def run_baseline_chatbot(user_query: str, provider) -> dict:
     """Chạy Chatbot gốc (Cấp 2) không có công cụ gọi Tool"""
     print(f"\n💬 [CHATBOT BASELINE] Câu hỏi: {user_query}")
+    start_time = time.time()
     response = provider.generate(user_query, system_prompt=CHATBOT_BASELINE_PROMPT)
+    latency_ms = round((time.time() - start_time) * 1000, 2)
     print(f"🤖 Chatbot phản hồi:\n{response}")
+    
+    p_tokens = max(10, (len(user_query) + len(CHATBOT_BASELINE_PROMPT)) // 4)
+    c_tokens = max(15, len(response) // 4)
+    usage = {
+        "prompt_tokens": p_tokens,
+        "completion_tokens": c_tokens,
+        "total_tokens": p_tokens + c_tokens
+    }
+    return {
+        "output": response,
+        "latency_ms": latency_ms,
+        "usage": usage,
+        "cost": calculate_token_cost(usage)
+    }
 
 
 def is_duplicate_call(trace_logs: list, tool_name: str, arguments: dict) -> bool:
@@ -70,13 +98,14 @@ def is_duplicate_call(trace_logs: list, tool_name: str, arguments: dict) -> bool
     return False
 
 
-def run_react_agent(user_query: str, provider, mcp_server: MCPAcademicServer) -> list:
+def run_react_agent(user_query: str, provider, mcp_server: MCPAcademicServer, max_iterations: int = MAX_ITERATIONS) -> list:
     """
     [REACT AGENT LOOP V2 - PRODUCTION GRADE]
     Thực thi vòng lặp Thought -> Action -> Observation với MCP Server và Safeguards
     Bám sát chuẩn giáo trình VinUniversity AI Course (Slide Day 3)
+    Hỗ trợ tùy chỉnh số vòng lặp tối đa max_iterations và ghi nhận Token / Chi phí
     """
-    print(f"\n🤖 [REACT AGENT] Câu hỏi: {user_query}")
+    print(f"\n🤖 [REACT AGENT] Câu hỏi: {user_query} (Max Iterations: {max_iterations})")
     
     step = 0
     trace_logs = []
@@ -85,10 +114,10 @@ def run_react_agent(user_query: str, provider, mcp_server: MCPAcademicServer) ->
     # Trajectory Context tích lũy qua từng vòng lặp
     trajectory_context = f"Yêu cầu của khách hàng: {user_query}"
     
-    while step < MAX_ITERATIONS:
+    while step < max_iterations:
         step += 1
         step_start_time = time.time()
-        print(f"\n--- 🔄 Vòng lặp ReAct Loop (Step {step}/{MAX_ITERATIONS}) ---")
+        print(f"\n--- 🔄 Vòng lặp ReAct Loop (Step {step}/{max_iterations}) ---")
         
         # Gọi LLM với Native Tool Calling Specs và ngữ cảnh tích lũy
         llm_response = provider.generate_with_tools(
@@ -97,9 +126,11 @@ def run_react_agent(user_query: str, provider, mcp_server: MCPAcademicServer) ->
             system_prompt=REACT_AGENT_SYSTEM_PROMPT
         )
         latency_ms = round((time.time() - step_start_time) * 1000, 2)
+        usage = llm_response.get("usage", {"prompt_tokens": 50, "completion_tokens": 30, "total_tokens": 80})
+        cost = calculate_token_cost(usage)
         
         thought = llm_response.get("thought", "Đang suy luận bước tiếp theo...")
-        print(f"🧠 [Thought]: {thought}")
+        print(f"🧠 [Thought]: {thought} (Tokens: {usage.get('total_tokens')} | Cost: {cost['vnd']} VNĐ)")
         
         # TRƯỜNG HỢP 1: LLM quyết định đưa ra Final Answer hoàn chỉnh
         if llm_response.get("type") == "text":
@@ -111,7 +142,9 @@ def run_react_agent(user_query: str, provider, mcp_server: MCPAcademicServer) ->
                 "action_type": "FINAL_ANSWER",
                 "thought": thought,
                 "output": final_content,
-                "latency_ms": latency_ms
+                "latency_ms": latency_ms,
+                "usage": usage,
+                "cost": cost
             })
             break
             
@@ -123,7 +156,8 @@ def run_react_agent(user_query: str, provider, mcp_server: MCPAcademicServer) ->
             print(f"🛠️ [Action Proposed]: {tool_name}({json.dumps(arguments, ensure_ascii=False)})")
             
             # SAFEGUARD 1: Phát hiện Agent đi vòng (Duplicate Tool Call)
-            if is_duplicate_call(trace_logs, tool_name, arguments):
+            is_dup = is_duplicate_call(trace_logs, tool_name, arguments)
+            if is_dup:
                 warning_msg = f"WARNING: Tool '{tool_name}' đã được gọi với tham số tương tự ở bước trước. Vui lòng không lặp lại và chuyển sang hành động khác hoặc trả lời khách."
                 print(f"⚠️ [SAFEGUARD TRIGGERED]: {warning_msg}")
                 obs_data = {"status": "DUPLICATE_CALL_WARNING", "message": warning_msg}
@@ -147,7 +181,10 @@ def run_react_agent(user_query: str, provider, mcp_server: MCPAcademicServer) ->
                 "tool_name": tool_name,
                 "arguments": arguments,
                 "observation": obs_data,
-                "latency_ms": latency_ms
+                "latency_ms": latency_ms,
+                "usage": usage,
+                "cost": cost,
+                "is_duplicate_blocked": is_dup
             })
             
             # Nạp Observation ngược lại vào Trajectory Context để LLM suy nghĩ bước kế tiếp
@@ -157,7 +194,7 @@ def run_react_agent(user_query: str, provider, mcp_server: MCPAcademicServer) ->
             trajectory_context += f"\n- Kết quả công cụ (Observation): {obs_str}"
             
             # SAFEGUARD 3: Kiểm tra Circuit Breaker khi chạm ngưỡng số bước tối đa
-            if step >= MAX_ITERATIONS:
+            if step >= max_iterations:
                 fallback_msg = (
                     f"Hệ thống đã thực hiện {step} bước suy luận tối đa (Max Iterations Circuit Breaker). "
                     "Đã ghi nhận các dữ liệu quan sát trên để hỗ trợ quý khách. Vui lòng liên hệ hotline 1900 6868 nếu cần trợ giúp thêm."
@@ -169,7 +206,10 @@ def run_react_agent(user_query: str, provider, mcp_server: MCPAcademicServer) ->
                     "action_type": "FINAL_ANSWER",
                     "thought": "Đạt giới hạn vòng lặp tối đa. Dừng lại an toàn và đưa ra phản hồi tổng kết.",
                     "output": fallback_msg,
-                    "latency_ms": 5.0
+                    "latency_ms": 5.0,
+                    "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0},
+                    "cost": {"usd": 0.0, "vnd": 0.0},
+                    "circuit_breaker_triggered": True
                 })
                 break
 
