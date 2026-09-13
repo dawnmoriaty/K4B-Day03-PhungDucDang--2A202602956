@@ -52,7 +52,7 @@ gantt
 ---
 
 ### 🔷 PHẦN 4 (30 phút): Tự kiểm tra & Nộp bài Git/GitHub
-* [x] Kiểm tra tên Repo cá nhân đúng chuẩn: **`K4B-Day03-PhungDucDang--2A202602956`**.
+* [x] Kiểm tra tên Repo cá nhân đúng chuẩn: **`K4B-Day03-PhungDucDang-2A202602956`**.
 * [x] Chạy lệnh Git để push toàn bộ mã nguồn lên GitHub cá nhân:
   ```bash
   git add .
