@@ -61,10 +61,20 @@ def run_baseline_chatbot(user_query: str, provider):
     print(f"🤖 Chatbot phản hồi:\n{response}")
 
 
+def is_duplicate_call(trace_logs: list, tool_name: str, arguments: dict) -> bool:
+    """Safeguard: Phát hiện xem cùng một tool với cùng tham số đã được gọi lặp lại hay chưa"""
+    for log in trace_logs:
+        if log.get("action_type") == "TOOL_EXECUTION":
+            if log.get("tool_name") == tool_name and log.get("arguments") == arguments:
+                return True
+    return False
+
+
 def run_react_agent(user_query: str, provider, mcp_server: MCPAcademicServer) -> list:
     """
-    [REACT AGENT LOOP] Thực thi vòng lặp Thought -> Action -> Observation với MCP Server
-    Trả về danh sách trace log của phiên thực thi.
+    [REACT AGENT LOOP V2 - PRODUCTION GRADE]
+    Thực thi vòng lặp Thought -> Action -> Observation với MCP Server và Safeguards
+    Bám sát chuẩn giáo trình VinUniversity AI Course (Slide Day 3)
     """
     print(f"\n🤖 [REACT AGENT] Câu hỏi: {user_query}")
     
@@ -72,22 +82,29 @@ def run_react_agent(user_query: str, provider, mcp_server: MCPAcademicServer) ->
     trace_logs = []
     tools_list = mcp_server.list_tools()
     
+    # Trajectory Context tích lũy qua từng vòng lặp
+    trajectory_context = f"Yêu cầu của khách hàng: {user_query}"
+    
     while step < MAX_ITERATIONS:
         step += 1
         step_start_time = time.time()
         print(f"\n--- 🔄 Vòng lặp ReAct Loop (Step {step}/{MAX_ITERATIONS}) ---")
         
-        # Gọi LLM với Native Tool Calling Specs
-        llm_response = provider.generate_with_tools(user_query, tools_list, system_prompt=REACT_AGENT_SYSTEM_PROMPT)
+        # Gọi LLM với Native Tool Calling Specs và ngữ cảnh tích lũy
+        llm_response = provider.generate_with_tools(
+            trajectory_context,
+            tools_list,
+            system_prompt=REACT_AGENT_SYSTEM_PROMPT
+        )
         latency_ms = round((time.time() - step_start_time) * 1000, 2)
         
-        thought = llm_response.get("thought", "Đang suy luận...")
+        thought = llm_response.get("thought", "Đang suy luận bước tiếp theo...")
         print(f"🧠 [Thought]: {thought}")
         
-        # Trường hợp 1: LLM quyết định trả lời bằng văn bản trực tiếp
+        # TRƯỜNG HỢP 1: LLM quyết định đưa ra Final Answer hoàn chỉnh
         if llm_response.get("type") == "text":
             final_content = llm_response.get("content", "")
-            print(f"🏁 [Final Answer]: {final_content}")
+            print(f"🏁 [Final Answer]:\n{final_content}")
             trace_logs.append({
                 "step": step,
                 "query": user_query,
@@ -98,42 +115,30 @@ def run_react_agent(user_query: str, provider, mcp_server: MCPAcademicServer) ->
             })
             break
             
-        # Trường hợp 2: LLM đề xuất gọi Tool (Action)
+        # TRƯỜNG HỢP 2: LLM đề xuất gọi Tool (Action)
         elif llm_response.get("type") == "tool_call":
             tool_name = llm_response.get("tool_name")
             arguments = llm_response.get("arguments", {})
             
-            print(f"🛠️ [Action Proposed]: {tool_name}({arguments})")
+            print(f"🛠️ [Action Proposed]: {tool_name}({json.dumps(arguments, ensure_ascii=False)})")
             
-            # Thực thi Tool qua MCP Server
-            mcp_result = mcp_server.call_tool(tool_name, arguments)
-            obs_data = mcp_result.get("result", {})
-            
-            if not obs_data:
-                print(f"👁️ [Observation từ MCP Server]: {{}}")
-                print(f"⚠️ [CHÚ Ý]: MCP Server trả về kết quả rỗng! Học viên cần hoàn thành TODO 2.1 trong 'src/mcp_server.py'.")
-                final_answer = "Chưa thể trả lời chi tiết do chưa nhận được dữ liệu từ MCP Server (hãy hoàn thành TODO 2.1)."
+            # SAFEGUARD 1: Phát hiện Agent đi vòng (Duplicate Tool Call)
+            if is_duplicate_call(trace_logs, tool_name, arguments):
+                warning_msg = f"WARNING: Tool '{tool_name}' đã được gọi với tham số tương tự ở bước trước. Vui lòng không lặp lại và chuyển sang hành động khác hoặc trả lời khách."
+                print(f"⚠️ [SAFEGUARD TRIGGERED]: {warning_msg}")
+                obs_data = {"status": "DUPLICATE_CALL_WARNING", "message": warning_msg}
             else:
-                obs_str = json.dumps(obs_data, ensure_ascii=False)
-                print(f"👁️ [Observation từ MCP Server]: {obs_str}")
-                
-                # Tổng hợp Final Answer từ kết quả Observation thực tế
-                if obs_data.get("status") == "SUCCESS":
-                    if "data" in obs_data:
-                        d = obs_data["data"]
-                        final_answer = (
-                            f"Kết quả tra cứu cho sinh viên {obs_data.get('student_id', '')} ({d.get('full_name', '')}): "
-                            f"Lớp {d.get('class', '')}, GPA: {d.get('gpa', '')}, Email: {d.get('email', '')}, "
-                            f"Trạng thái: {d.get('status', '')}, Cố vấn: {d.get('advisor', '')}."
-                        )
-                    elif "message" in obs_data:
-                        final_answer = obs_data["message"]
-                    else:
-                        final_answer = f"Đã hoàn tất xử lý qua MCP Server: {json.dumps(obs_data, ensure_ascii=False)}"
-                elif obs_data.get("status") == "NOT_FOUND":
-                    final_answer = obs_data.get("message", "Không tìm thấy thông tin sinh viên yêu cầu.")
-                else:
-                    final_answer = f"Phản hồi từ công cụ: {json.dumps(obs_data, ensure_ascii=False)}"
+                # SAFEGUARD 2: Bắt lỗi Timeout & Exception khi gọi qua MCP Server
+                try:
+                    mcp_result = mcp_server.call_tool(tool_name, arguments)
+                    obs_data = mcp_result.get("result", {})
+                except TimeoutError:
+                    obs_data = {"status": "TIMEOUT_ERROR", "error": f"Tool {tool_name} timed out after 5s"}
+                except Exception as e:
+                    obs_data = {"status": "EXECUTION_ERROR", "error": str(e)}
+            
+            obs_str = json.dumps(obs_data, ensure_ascii=False)
+            print(f"👁️ [Observation từ MCP Server]: {obs_str}")
             
             trace_logs.append({
                 "step": step,
@@ -145,19 +150,28 @@ def run_react_agent(user_query: str, provider, mcp_server: MCPAcademicServer) ->
                 "latency_ms": latency_ms
             })
             
-            # Kết thúc vòng lặp sau khi hoàn tất Observation và xuất Final Answer
-            print(f"🧠 [Thought]: Đã nhận được dữ liệu từ MCP Server. Tổng hợp kết quả phản hồi.")
-            print(f"🏁 [Final Answer]: {final_answer}")
+            # Nạp Observation ngược lại vào Trajectory Context để LLM suy nghĩ bước kế tiếp
+            trajectory_context += f"\n\n[Step {step}]"
+            trajectory_context += f"\n- Thought: {thought}"
+            trajectory_context += f"\n- Action: {tool_name}({json.dumps(arguments, ensure_ascii=False)})"
+            trajectory_context += f"\n- Kết quả công cụ (Observation): {obs_str}"
             
-            trace_logs.append({
-                "step": step + 1,
-                "query": user_query,
-                "action_type": "FINAL_ANSWER",
-                "thought": "Tổng hợp kết quả từ MCP Server thành công.",
-                "output": final_answer,
-                "latency_ms": 10.0
-            })
-            break
+            # SAFEGUARD 3: Kiểm tra Circuit Breaker khi chạm ngưỡng số bước tối đa
+            if step >= MAX_ITERATIONS:
+                fallback_msg = (
+                    f"Hệ thống đã thực hiện {step} bước suy luận tối đa (Max Iterations Circuit Breaker). "
+                    "Đã ghi nhận các dữ liệu quan sát trên để hỗ trợ quý khách. Vui lòng liên hệ hotline 1900 6868 nếu cần trợ giúp thêm."
+                )
+                print(f"🛑 [CIRCUIT BREAKER]: {fallback_msg}")
+                trace_logs.append({
+                    "step": step + 1,
+                    "query": user_query,
+                    "action_type": "FINAL_ANSWER",
+                    "thought": "Đạt giới hạn vòng lặp tối đa. Dừng lại an toàn và đưa ra phản hồi tổng kết.",
+                    "output": fallback_msg,
+                    "latency_ms": 5.0
+                })
+                break
 
     return trace_logs
 

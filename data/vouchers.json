@@ -1,0 +1,51 @@
+{
+  "happy_hour_vouchers": [
+    {
+      "voucher_code": "LUNCH15",
+      "name": "Giờ Vàng Bữa Trưa",
+      "time_slot": "11:00 - 13:30",
+      "keywords": ["11:", "12:", "13:00", "13:15", "13:30", "trưa"],
+      "discount_amount": 15000,
+      "min_order_value": 0,
+      "description": "Giảm ngay 15.000 VNĐ cho mọi đơn hàng giao trong khung giờ trưa từ 11:00 đến 13:30."
+    },
+    {
+      "voucher_code": "DINNER20",
+      "name": "Giờ Vàng Bữa Tối",
+      "time_slot": "17:30 - 19:30",
+      "keywords": ["17:30", "18:", "19:00", "19:15", "19:30", "tối"],
+      "discount_amount": 20000,
+      "min_order_value": 0,
+      "description": "Giảm ngay 20.000 VNĐ cho mọi đơn hàng giao trong khung giờ tối từ 17:30 đến 19:30."
+    },
+    {
+      "voucher_code": "HEALTHY10",
+      "name": "Khách Hàng Mới",
+      "time_slot": "Toàn thời gian",
+      "keywords": ["all", "mới", "welcome"],
+      "discount_amount": 10000,
+      "min_order_value": 70000,
+      "description": "Giảm 10.000 VNĐ cho đơn từ 70.000 VNĐ áp dụng toàn bộ các khung giờ."
+    }
+  ],
+  "allergen_rules": {
+    "seafood": {
+      "keywords": ["hải sản", "hai san", "tôm", "tom", "cua", "mực", "muc", "cá", "ca", "seafood", "shrimp", "fish"],
+      "blocked_sets": ["SET-SEAFOOD-01", "SET-SEAFOOD-02", "SET-CLEAN-02"],
+      "recommended_safe_sets": ["SET-CLEAN-01", "SET-VEGAN-01", "SET-VEGAN-02", "SET-BEEF-01"],
+      "warning": "CẢNH BÁO DỊ ỨNG: Khách hàng dị ứng Hải sản. TUYỆT ĐỐI LOẠI BỎ 'SET-SEAFOOD-01', 'SET-SEAFOOD-02', 'SET-CLEAN-02'. Khuyến nghị chọn 'SET-CLEAN-01' (Eat Clean giảm cân), 'SET-VEGAN-01' (Chay) hoặc 'SET-BEEF-01' (Bò Úc)."
+    },
+    "dairy": {
+      "keywords": ["sữa", "phô mai", "cheese", "dairy", "bơ sữa"],
+      "blocked_sets": ["SET-KETO-01", "SET-SNACK-01"],
+      "recommended_safe_sets": ["SET-CLEAN-01", "SET-VEGAN-01", "SET-VEGAN-02"],
+      "warning": "CẢNH BÁO DỊ ỨNG: Khách hàng dị ứng Sữa/Phô mai. Tránh các set 'SET-KETO-01' và 'SET-SNACK-01'."
+    },
+    "egg": {
+      "keywords": ["trứng", "egg"],
+      "blocked_sets": ["SET-KETO-01", "SET-KETO-02"],
+      "recommended_safe_sets": ["SET-CLEAN-01", "SET-VEGAN-01", "SET-VEGAN-02", "SET-BEEF-01"],
+      "warning": "CẢNH BÁO DỊ ỨNG: Khách hàng dị ứng Trứng. Tránh các set Keto chứa trứng."
+    }
+  }
+}

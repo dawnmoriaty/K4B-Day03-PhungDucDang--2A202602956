@@ -1,0 +1,160 @@
+[
+  {
+    "name": "calculate_diet_portion",
+    "description": "Tính toán khẩu phần ăn, tổng lượng calories và lượng đạm (protein) cần nạp dựa trên số lượng người ăn, mục tiêu thể trạng (giảm cân, tăng cơ, duy trì) và sở thích nguồn đạm (bò, gà, cá, chay, đậu hũ). Luôn gợi ý số suất và các set ăn phù hợp nhất.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "num_people": {
+          "type": "integer",
+          "description": "Số lượng người ăn (ví dụ: 1, 2, 3, 4)."
+        },
+        "diet_type": {
+          "type": "string",
+          "description": "Chế độ ăn uống: 'eat_clean' (giảm mỡ), 'tang_co' (nhiều đạm gym), 'chay' (thuần thực vật), 'keto' (cắt carb), hoặc 'tu_do'."
+        },
+        "preferred_protein": {
+          "type": "string",
+          "description": "Nguồn đạm ưu tiên: 'ga', 'bo', 'ca', 'hai_san', 'dau_hu' hoặc để trống nếu không kén."
+        }
+      },
+      "required": ["num_people"]
+    }
+  },
+  {
+    "name": "check_allergy",
+    "description": "Kiểm tra tiền sử dị ứng thực phẩm hoặc chế độ ăn của khách hàng. Nếu khách hàng không nhắc gì đến dị ứng hoặc nói không có, mặc định là không có dị ứng và tất cả các món ăn trên menu đều an toàn.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "allergy_info": {
+          "type": "string",
+          "description": "Mô tả dị ứng của khách (ví dụ: 'dị ứng hải sản', 'dị ứng tôm', 'không ăn được lạc'). Nếu không có, truyền chuỗi rỗng ''."
+        }
+      },
+      "required": ["allergy_info"]
+    }
+  },
+  {
+    "name": "query_food_set",
+    "description": "Tra cứu và gợi ý các set đồ ăn theo mã set cụ thể, hoặc lọc theo ngân sách tối đa (max_budget), theo danh mục (chay, eat_clean, tang_co, hai_san, keto). Luôn ưu tiên trả về danh sách ít nhất 3 món phù hợp kèm giá tiền và calo rõ ràng.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "set_code": {
+          "type": "string",
+          "description": "Mã set đồ ăn cụ thể nếu khách hỏi đích danh (ví dụ: 'SET-CLEAN-01')."
+        },
+        "category": {
+          "type": "string",
+          "description": "Danh mục món ăn: 'eat_clean', 'chay', 'tang_co', 'hai_san', 'keto', hoặc 'all'."
+        },
+        "max_budget": {
+          "type": "integer",
+          "description": "Ngân sách tối đa của khách bằng VNĐ (ví dụ: 80000, 100000) để lọc món vừa túi tiền."
+        },
+        "min_items": {
+          "type": "integer",
+          "description": "Số lượng món gợi ý tối thiểu (mặc định là 3 món)."
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "check_voucher",
+    "description": "Kiểm tra mã giảm giá (voucher) theo khung giờ giao nhận hàng. Áp dụng mã LUNCH15 giảm 15k trong khung giờ trưa (11:00-13:30) và mã DINNER20 giảm 20k trong khung giờ tối (17:30-19:30). Ngoài khung giờ này, mặc định không có voucher.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "order_time": {
+          "type": "string",
+          "description": "Thời gian giao hàng hoặc thời điểm đặt (ví dụ: '12:00', '18:30', '14:00') để kiểm tra xem có rơi vào khung giờ vàng hay không."
+        },
+        "voucher_code": {
+          "type": "string",
+          "description": "Mã voucher khách cung cấp nếu có (ví dụ: 'LUNCH15', 'DINNER20')."
+        }
+      },
+      "required": ["order_time"]
+    }
+  },
+  {
+    "name": "order_food_set",
+    "description": "Tạo đơn đặt set đồ ăn cho khách hàng, tự động tính tổng tiền thanh toán và trừ giảm giá nếu có voucher.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "customer_name": {
+          "type": "string",
+          "description": "Họ và tên khách hàng đặt món (ví dụ: 'Đăng')"
+        },
+        "set_code": {
+          "type": "string",
+          "description": "Mã set đồ ăn được chọn (ví dụ: 'SET-CLEAN-01', 'SET-VEGAN-01', 'SET-BEEF-01')"
+        },
+        "delivery_address": {
+          "type": "string",
+          "description": "Địa chỉ nhận hàng (ví dụ: 'số 12 Chùa Bộc')"
+        },
+        "quantity": {
+          "type": "integer",
+          "description": "Số lượng suất ăn muốn đặt (mặc định là 1)"
+        },
+        "delivery_time": {
+          "type": "string",
+          "description": "Thời gian giao hàng mong muốn (ví dụ: '12:00 trưa nay', '18:30 tối')"
+        },
+        "phone": {
+          "type": "string",
+          "description": "Số điện thoại người nhận hàng (ví dụ: '0912345678')"
+        },
+        "voucher_code": {
+          "type": "string",
+          "description": "Mã giảm giá áp dụng nếu có (ví dụ: 'LUNCH15', 'DINNER20')"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Ghi chú đặc biệt cho nhà bếp (ví dụ: 'không cay', 'giao đúng giờ')"
+        }
+      },
+      "required": ["customer_name", "set_code", "delivery_address"]
+    }
+  },
+  {
+    "name": "academic_query",
+    "description": "Tra cứu hồ sơ sinh viên bằng mã sinh viên (mẫu baseline).",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "student_id": {
+          "type": "string",
+          "description": "Mã sinh viên (ví dụ: 'SV2026001')"
+        }
+      },
+      "required": ["student_id"]
+    }
+  },
+  {
+    "name": "schedule_appointment",
+    "description": "Đặt lịch hẹn tư vấn học vụ (mẫu baseline).",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "student_id": {
+          "type": "string",
+          "description": "Mã sinh viên"
+        },
+        "datetime_str": {
+          "type": "string",
+          "description": "Thời gian hẹn"
+        },
+        "advisor_name": {
+          "type": "string",
+          "description": "Tên cố vấn"
+        }
+      },
+      "required": ["student_id", "datetime_str"]
+    }
+  }
+]

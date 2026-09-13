@@ -14,3 +14,7 @@ __pycache__/
 Thumbs.db
 .vscode/
 .idea/
+
+# Internal Workflow drafts
+workflow/
+.obsidian/

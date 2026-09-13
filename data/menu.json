@@ -1,0 +1,180 @@
+{
+  "restaurant_info": {
+    "name": "Healthy Food & Meal Plan Assistant",
+    "hotline": "1900 6868",
+    "address": "Tòa nhà Park 8, Vinhomes Ocean Park, Gia Lâm, Hà Nội",
+    "operating_hours": "07:00 - 21:30 hàng ngày"
+  },
+  "items": [
+    {
+      "set_code": "SET-CLEAN-01",
+      "name": "Set Eat Clean Ức Gà Nướng Thảo Mộc Quinoa",
+      "category": "Eat Clean / Giảm cân",
+      "price": 75000,
+      "calories": 480,
+      "macros": {
+        "protein_g": 42,
+        "carb_g": 38,
+        "fat_g": 9
+      },
+      "ingredients": ["Ức gà phi lê tươi", "Hạt Quinoa hữu cơ", "Bông cải xanh", "Cà rốt baby", "Sốt mè rang Nhật Bản"],
+      "allergens": [],
+      "allergen_warning": "Không chứa hải sản. Không sữa. Rất ít dầu mỡ, tối ưu đốt mỡ và giảm cân.",
+      "suitable_for": ["Giảm cân", "Eat Clean", "Không dị ứng hải sản"],
+      "status": "Còn hàng"
+    },
+    {
+      "set_code": "SET-CLEAN-02",
+      "name": "Set Cá Hồi Nauy Áp Chảo Sốt Chanh Leo & Gạo Lứt",
+      "category": "Eat Clean / Omega-3",
+      "price": 115000,
+      "calories": 530,
+      "macros": {
+        "protein_g": 38,
+        "carb_g": 42,
+        "fat_g": 18
+      },
+      "ingredients": ["Cá hồi Nauy tươi", "Gạo lứt huyết rồng", "Măng tây xào tỏi", "Sốt chanh leo cốt tươi"],
+      "allergens": ["Cá hồi", "Hải sản"],
+      "allergen_warning": "CẢNH BÁO DỊ ỨNG: Chứa Cá hồi. Người có tiền sử dị ứng hải sản / cá biển cần lưu ý!",
+      "suitable_for": ["Bổ sung Omega-3", "Eat Clean cao cấp", "Tốt cho tim mạch"],
+      "status": "Còn hàng"
+    },
+    {
+      "set_code": "SET-VEGAN-01",
+      "name": "Set Chay Thanh Đạm Đậu Hũ Non Sốt Nấm Đùi Gà",
+      "category": "Thuần Chay / Vegan",
+      "price": 65000,
+      "calories": 420,
+      "macros": {
+        "protein_g": 22,
+        "carb_g": 56,
+        "fat_g": 10
+      },
+      "ingredients": ["Đậu hũ non hữu cơ", "Nấm đùi gà tươi", "Cơm gạo lứt đỏ Điện Biên", "Rau bina xào dầu oliu", "Canh rong biển hạt sen"],
+      "allergens": [],
+      "allergen_warning": "Thuần thực vật 100%, không chứa sữa/trứng/hải sản/thịt động vật.",
+      "suitable_for": ["Ăn chay", "Thanh lọc cơ thể", "An toàn tuyệt đối với mọi tiền sử dị ứng động vật"],
+      "status": "Còn hàng"
+    },
+    {
+      "set_code": "SET-VEGAN-02",
+      "name": "Set Chay Cà Tím Nướng Miso Nhật & Cơm Ngũ Hạt",
+      "category": "Thuần Chay / Dưỡng sinh",
+      "price": 70000,
+      "calories": 410,
+      "macros": {
+        "protein_g": 18,
+        "carb_g": 58,
+        "fat_g": 8
+      },
+      "ingredients": ["Cà tím Nhật nướng sốt Miso", "Cơm ngũ hạt (hạt kê, yến mạch, đậu đen)", "Bí ngòi áp chảo", "Canh nấm đông cô"],
+      "allergens": ["Đậu nành (trong sốt miso)"],
+      "allergen_warning": "Không chứa hải sản. Chứa đậu nành trong sốt miso.",
+      "suitable_for": ["Ăn chay", "Dưỡng sinh", "Giảm huyết áp"],
+      "status": "Còn hàng"
+    },
+    {
+      "set_code": "SET-SEAFOOD-01",
+      "name": "Set Hải Sản Tôm Sú Áp Chảo Măng Tây & Khoai Lang Mật",
+      "category": "Hải sản Cao cấp",
+      "price": 95000,
+      "calories": 510,
+      "macros": {
+        "protein_g": 40,
+        "carb_g": 45,
+        "fat_g": 11
+      },
+      "ingredients": ["Tôm sú tươi bóc nõn (6 con)", "Măng tây xanh", "Khoai lang mật nướng", "Sốt bơ tỏi lá thyme"],
+      "allergens": ["Tôm sú", "Hải sản"],
+      "allergen_warning": "CẢNH BÁO DỊ ỨNG: Chứa Tôm sú (Hải sản). Người dị ứng hải sản TUYỆT ĐỐI KHÔNG DÙNG!",
+      "suitable_for": ["Giàu Canxi & Đạm", "Người thích hải sản"],
+      "status": "Còn hàng"
+    },
+    {
+      "set_code": "SET-SEAFOOD-02",
+      "name": "Set Mực Ống Nướng Sa Tế Dầu Hào & Salad Cầu Vồng",
+      "category": "Hải sản / Đậm vị",
+      "price": 90000,
+      "calories": 490,
+      "macros": {
+        "protein_g": 36,
+        "carb_g": 40,
+        "fat_g": 12
+      },
+      "ingredients": ["Mực ống tươi nướng", "Bắp ngọt nướng", "Salad bắp cải tím xà lách", "Cơm gạo lứt"],
+      "allergens": ["Mực", "Hải sản"],
+      "allergen_warning": "CẢNH BÁO DỊ ỨNG: Chứa Mực ống (Hải sản). Người dị ứng hải sản TUYỆT ĐỐI KHÔNG DÙNG!",
+      "suitable_for": ["Người thích vị đậm đà", "Giàu đạm ít béo"],
+      "status": "Còn hàng"
+    },
+    {
+      "set_code": "SET-BEEF-01",
+      "name": "Set Thăn Bò Úc Áp Chảo Khoai Tây Nghiền & Đậu Cove",
+      "category": "Tăng cơ / Giàu Protein",
+      "price": 85000,
+      "calories": 560,
+      "macros": {
+        "protein_g": 45,
+        "carb_g": 40,
+        "fat_g": 16
+      },
+      "ingredients": ["Thăn bò Úc thái lát áp chảo", "Khoai tây nghiền bơ nhạt", "Đậu cove luộc", "Sốt tiêu đen"],
+      "allergens": [],
+      "allergen_warning": "Không chứa hải sản. Giàu sắt và protein cho người tập gym, tăng cơ bắp.",
+      "suitable_for": ["Tập thể hình", "Tăng cân lành mạnh", "Bổ sung sắt"],
+      "status": "Còn hàng"
+    },
+    {
+      "set_code": "SET-KETO-01",
+      "name": "Set Keto Đùi Gà Rút Xương Nướng Phô Mai Mozzarella",
+      "category": "Keto / Low-Carb",
+      "price": 85000,
+      "calories": 620,
+      "macros": {
+        "protein_g": 48,
+        "carb_g": 6,
+        "fat_g": 38
+      },
+      "ingredients": ["Đùi gà góc tư rút xương", "Phô mai Mozzarella đút lò", "Salad rau rocket sốt dầu dấm", "Trứng ốp la"],
+      "allergens": ["Phô mai (Sữa)", "Trứng"],
+      "allergen_warning": "Không chứa hải sản. CẢNH BÁO DỊ ỨNG: Chứa sản phẩm từ sữa và trứng.",
+      "suitable_for": ["Ăn kiêng Keto", "Cắt giảm Carb", "Tập gym"],
+      "status": "Còn hàng"
+    },
+    {
+      "set_code": "SET-KETO-02",
+      "name": "Set Keto Ba Chỉ Xông Khói Trứng Chần & Bơ Quả Sáp",
+      "category": "Keto Siêu Giàu Béo Tốt",
+      "price": 90000,
+      "calories": 640,
+      "macros": {
+        "protein_g": 32,
+        "carb_g": 8,
+        "fat_g": 46
+      },
+      "ingredients": ["Ba chỉ hun khói áp chảo giòn", "Bơ sáp Đắk Lắk thái lát", "2 quả trứng chần", "Hạt hạnh nhân rang bơ"],
+      "allergens": ["Trứng", "Hạnh nhân (Hạt cây)"],
+      "allergen_warning": "Không chứa hải sản. CẢNH BÁO DỊ ỨNG: Chứa trứng và hạt hạnh nhân.",
+      "suitable_for": ["Keto chuyên sâu", "Bổ sung chất béo thực vật lành mạnh"],
+      "status": "Còn hàng"
+    },
+    {
+      "set_code": "SET-SNACK-01",
+      "name": "Set Detox Nước Ép Cần Tây Táo Xanh & Sữa Chua Hy Lạp Hạt Chia",
+      "category": "Tráng miệng / Detox",
+      "price": 45000,
+      "calories": 190,
+      "macros": {
+        "protein_g": 8,
+        "carb_g": 24,
+        "fat_g": 4
+      },
+      "ingredients": ["Nước ép cần tây nguyên chất ép lạnh", "Táo xanh hữu cơ", "Sữa chua Hy Lạp không đường", "Hạt chia hữu cơ"],
+      "allergens": ["Sữa chua (Sữa)"],
+      "allergen_warning": "Không chứa hải sản. Chứa sữa trong sữa chua Hy Lạp.",
+      "suitable_for": ["Detox đường ruột", "Đẹp da", "Ăn nhẹ buổi xế chiều"],
+      "status": "Còn hàng"
+    }
+  ]
+}

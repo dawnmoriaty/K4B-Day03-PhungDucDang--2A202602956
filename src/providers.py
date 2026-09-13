@@ -32,20 +32,70 @@ class MockOfflineProvider(BaseLLMProvider):
         self.model_name = "Offline-Mock-Model-2026"
 
     def generate(self, prompt: str, system_prompt: str = "") -> str:
-        return f"[Mock Chatbot Response]: Xin chào! Tôi đã nhận được câu hỏi '{prompt}'. (Chế độ Chatbot không có Tool tra cứu dữ liệu thời gian thực)."
+        return f"[Mock Chatbot Response]: Xin chào! Tôi đã nhận được câu hỏi '{prompt}'. (Chế độ Chatbot không có Tool tra cứu dữ liệu thời gian thực hay đặt món)."
 
     def generate_with_tools(self, prompt: str, tools_schema: List[Dict[str, Any]], system_prompt: str = "") -> Dict[str, Any]:
         prompt_lower = prompt.lower()
         
-        # Mô phỏng nhận diện intent gọi Tool
-        if "sv2026001" in prompt_lower and "đặt lịch" in prompt_lower:
+        # 1. Đã có đủ thông tin sau quan sát -> Xuất Final Answer
+        if "kết quả công cụ (observation):" in prompt_lower:
+            return {
+                "type": "text",
+                "content": "Dạ mình đã tổng hợp đầy đủ thông tin từ hệ thống: Khách hàng an toàn với các set gợi ý, áp dụng ưu đãi giờ vàng thành công và sẵn sàng phục vụ quý khách!",
+                "thought": "Đã nhận được dữ liệu quan sát từ MCP Server. Tôi sẽ xuất câu trả lời hoàn chỉnh cho khách hàng."
+            }
+
+        # 2. Xử lý kịch bản Đặt set đồ ăn (Food Assistant)
+        if "dị ứng" in prompt_lower and "check_allergy" not in prompt_lower:
+            return {
+                "type": "tool_call",
+                "tool_name": "check_allergy",
+                "arguments": {"allergy_info": "dị ứng hải sản"},
+                "thought": "Khách hàng có đề cập đến tiền sử dị ứng thực phẩm. Tôi cần gọi tool check_allergy trước để đảm bảo an toàn tuyệt đối."
+            }
+        elif ("ăn tối" in prompt_lower or "tối nay" in prompt_lower or "18:30" in prompt_lower) and "check_voucher" not in prompt_lower:
+            return {
+                "type": "tool_call",
+                "tool_name": "check_voucher",
+                "arguments": {"order_time": "18:30 tối"},
+                "thought": "Khách hàng muốn ăn hoặc giao hàng vào buổi tối. Tôi sẽ kiểm tra mã ưu đãi giờ vàng bữa tối bằng tool check_voucher."
+            }
+        elif "đặt 2 suất" in prompt_lower or "đặt" in prompt_lower and "chùa bộc" in prompt_lower:
+            return {
+                "type": "tool_call",
+                "tool_name": "order_food_set",
+                "arguments": {
+                    "customer_name": "Đăng",
+                    "set_code": "SET-CLEAN-01",
+                    "delivery_address": "số 12 Chùa Bộc",
+                    "quantity": 2,
+                    "delivery_time": "12:00 trưa nay",
+                    "phone": "0912345678"
+                },
+                "thought": "Khách hàng yêu cầu đặt món với đầy đủ thông tin địa chỉ và thời gian. Tôi sẽ tiến hành gọi tool order_food_set để tạo đơn hàng."
+            }
+        elif "set-vip-9999" in prompt_lower:
+            return {
+                "type": "tool_call",
+                "tool_name": "query_food_set",
+                "arguments": {"set_code": "SET-VIP-9999"},
+                "thought": "Khách hàng muốn tra cứu thông tin set ăn có mã SET-VIP-9999. Tôi sẽ gọi tool query_food_set."
+            }
+        elif "set-clean-01" in prompt_lower or "tra cứu thông tin chi tiết" in prompt_lower:
+            return {
+                "type": "tool_call",
+                "tool_name": "query_food_set",
+                "arguments": {"set_code": "SET-CLEAN-01"},
+                "thought": "Khách hàng muốn tra cứu thông tin dinh dưỡng set SET-CLEAN-01. Tôi sẽ gọi tool query_food_set."
+            }
+        elif "sv2026001" in prompt_lower and "đặt lịch" in prompt_lower:
             return {
                 "type": "tool_call",
                 "tool_name": "schedule_appointment",
                 "arguments": {"student_id": "SV2026001", "datetime_str": "14:00 15/09/2026", "advisor_name": "PGS.TS Nguyễn Văn A"},
                 "thought": "Người dùng yêu cầu đặt lịch hẹn tư vấn cho sinh viên SV2026001. Tôi sẽ gọi tool schedule_appointment."
             }
-        elif "sv2026001" in prompt_lower or "tra cứu" in prompt_lower:
+        elif "sv2026001" in prompt_lower or "tra cứu thông tin học vụ" in prompt_lower:
             return {
                 "type": "tool_call",
                 "tool_name": "academic_query",
@@ -55,8 +105,8 @@ class MockOfflineProvider(BaseLLMProvider):
         else:
             return {
                 "type": "text",
-                "content": f"[Mock Agent Response]: Xin chào! Quy chế học vụ VinUni yêu cầu sinh viên tích lũy tối thiểu 120 tín chỉ và duy trì GPA trên 2.0 để tốt nghiệp.",
-                "thought": "Câu hỏi chung về quy chế học vụ, trả lời trực tiếp không cần gọi Tool."
+                "content": "[Healthy Food Assistant]: Chào bạn! Quán chúng mình chuyên cung cấp các set ăn lành mạnh gồm: Eat Clean (giảm mỡ), Thuần chay (dưỡng sinh), Bò Úc (tăng cơ) và Keto. Quán có giao hàng tận nơi từ 07:00 đến 21:30 hàng ngày với nhiều voucher giờ vàng hấp dẫn!",
+                "thought": "Câu hỏi chung về thực đơn và chính sách của quán, trả lời trực tiếp từ System Prompt mà không cần gọi Tool."
             }
 
 
@@ -64,7 +114,7 @@ class GeminiProvider(BaseLLMProvider):
     """Google Gemini Provider (Native Tool Calling với Google GenAI SDK)"""
     def __init__(self, api_key: str = None, model: str = None):
         self.api_key = api_key or os.getenv("GEMINI_API_KEY")
-        self.model_name = model or os.getenv("LLM_MODEL") or "gemini-2.5-flash"
+        self.model_name = model or os.getenv("LLM_MODEL") or "gemini-3.6-flash"
 
     def generate(self, prompt: str, system_prompt: str = "") -> str:
         if not self.api_key or self.api_key == "your_gemini_api_key_here":

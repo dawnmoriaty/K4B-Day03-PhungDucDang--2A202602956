@@ -1,0 +1,37 @@
+[
+    {
+        "id": "TC01",
+        "type": "direct_query",
+        "question": "Chào bạn, quán của mình có những loại set ăn nào và chính sách giao hàng ra sao?",
+        "expected_behavior": "Agent trả lời trực tiếp từ System Prompt về các loại set ăn (Eat Clean, Chay, Tăng cơ) mà không cần gọi Tool.",
+        "complexity": "Low"
+    },
+    {
+        "id": "TC02",
+        "type": "single_tool_query",
+        "question": "Cho tôi tra cứu thông tin chi tiết và thành phần dinh dưỡng của set 'SET-CLEAN-01'.",
+        "expected_behavior": "Agent nhận diện nhu cầu tra cứu, tự động phát sinh Tool Call 'query_food_set' với mã set 'SET-CLEAN-01'.",
+        "complexity": "Medium"
+    },
+    {
+        "id": "TC03",
+        "type": "appointment_booking",
+        "question": "Tôi muốn đặt 2 suất set ăn 'SET-CLEAN-01' giao đến số 12 Chùa Bộc vào lúc 12:00 trưa nay, người nhận là Đăng (SĐT: 0912345678).",
+        "expected_behavior": "Agent tự động phát sinh Tool Call 'order_food_set' với đầy đủ thông tin khách hàng, số lượng và thời gian giao.",
+        "complexity": "Medium"
+    },
+    {
+        "id": "TC04",
+        "type": "multi_step_reasoning",
+        "question": "Tôi đang cần giảm cân nhưng bị dị ứng hải sản. Bạn hãy gợi ý set ăn phù hợp và đặt giúp tôi 1 suất giao lúc 18:30 tối nay nhé.",
+        "expected_behavior": "Agent thực hiện chuỗi ReAct đa bước: Tra cứu thực đơn -> Lọc bỏ đồ dị ứng -> Chọn set phù hợp -> Gọi tool đặt hàng.",
+        "complexity": "High"
+    },
+    {
+        "id": "TC05",
+        "type": "edge_case_handling",
+        "question": "Tra cứu giúp tôi set ăn có mã 'SET-VIP-9999'.",
+        "expected_behavior": "Agent nhận kết quả NOT_FOUND từ Tool và đưa ra phản hồi lịch sự, chính xác rằng không có set này.",
+        "complexity": "Medium"
+    }
+]
