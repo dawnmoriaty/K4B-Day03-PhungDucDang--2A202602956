@@ -163,6 +163,56 @@ def execute_check_allergy(allergy_info: str = "") -> str:
     }, ensure_ascii=False)
 
 
+def match_menu_category(item: Dict[str, Any], cat_input: str) -> bool:
+    """Đối soát danh mục món ăn chính xác, phân biệt rõ món chay, bò, gà, hải sản, keto"""
+    import unicodedata
+    import re
+    if not cat_input or cat_input in ["all", "tat ca", "menu", "tất cả"]:
+        return True
+
+    clean_cat = cat_input.lower().replace("_", " ").strip()
+    clean_cat_no_accents = unicodedata.normalize("NFD", clean_cat)
+    clean_cat_no_accents = re.sub(r"[\u0300-\u036f]", "", clean_cat_no_accents).replace("đ", "d")
+
+    cat_field = item.get("category", "").lower()
+    name_field = item.get("name", "").lower()
+    desc_field = (cat_field + " " + name_field + " " + " ".join(item.get("ingredients", []))).lower()
+
+    # 1. Bò / Beef / Tăng cơ
+    if any(k in clean_cat_no_accents for k in ["bo", "beef", "thit bo"]):
+        if "thuần chay" in cat_field or "chay" in cat_field:
+            return False
+        return "bò" in name_field or "bò" in cat_field or "bò" in desc_field
+
+    if any(k in clean_cat_no_accents for k in ["tang co", "protein", "gym"]):
+        return "tăng cơ" in cat_field or "protein" in cat_field
+
+    # 2. Chay / Vegan
+    if any(k in clean_cat_no_accents for k in ["chay", "vegan", "thuan chay"]):
+        return "thuần chay" in cat_field or "vegan" in cat_field or "chay" in cat_field
+
+    # 3. Gà / Chicken
+    if any(k in clean_cat_no_accents for k in ["ga", "chicken", "thit ga"]):
+        if "thuần chay" in cat_field or "chay" in cat_field:
+            return False
+        return "gà" in name_field or "ức gà" in desc_field or "đùi gà" in desc_field
+
+    # 4. Eat Clean / Giảm cân
+    if any(k in clean_cat_no_accents for k in ["eat clean", "clean", "giam can", "giam mo"]):
+        return "eat clean" in cat_field or "clean" in cat_field
+
+    # 5. Hải sản / Seafood
+    if any(k in clean_cat_no_accents for k in ["hai san", "seafood", "tom", "muc", "ca"]):
+        return "hải sản" in cat_field or "hải sản" in name_field
+
+    # 6. Keto
+    if "keto" in clean_cat_no_accents:
+        return "keto" in cat_field
+
+    # Khớp chuỗi dự phòng
+    return clean_cat_no_accents in unicodedata.normalize("NFD", desc_field)
+
+
 def execute_query_food_set(
     set_code: str = "",
     category: str = "all",
@@ -170,8 +220,8 @@ def execute_query_food_set(
     min_items: int = 3
 ) -> str:
     """
-    Tra cứu chi tiết một món hoặc gợi ý ít nhất 3 món phù hợp theo ngân sách (max_budget),
-    danh mục (chay, eat_clean, tang_co...) kèm giá tiền và calo.
+    Tra cứu chi tiết một món hoặc gợi ý các món phù hợp theo ngân sách (max_budget),
+    danh mục (chay, eat_clean, tang_co, bo, ga...) kèm giá tiền và calo.
     """
     menu_db = load_menu_items()
     code = (set_code or "").strip().upper()
@@ -180,6 +230,7 @@ def execute_query_food_set(
     if code and code not in ["ALL", "MENU", "DANH MỤC", "TẤT CẢ"]:
         item = menu_db.get(code)
         if item:
+            print(f"🗄️ [DB QUERY]: Tra cứu mã '{code}' trong data/menu.json ➔ Khớp: '{item['name']}' ({item['price']:,} VNĐ | {item['calories']} kcal)")
             return json.dumps({
                 "status": "SUCCESS",
                 "set_code": code,
@@ -196,35 +247,28 @@ def execute_query_food_set(
                 }
             }, ensure_ascii=False)
         else:
+            print(f"🗄️ [DB QUERY]: Tra cứu mã '{code}' trong data/menu.json ➔ Kết quả: NOT_FOUND (Không tồn tại)")
             return json.dumps({
                 "status": "NOT_FOUND",
                 "message": f"Không tìm thấy thông tin set đồ ăn có mã '{set_code}' trong hệ thống thực đơn quán."
             }, ensure_ascii=False)
 
-    # Trường hợp gợi ý / lọc theo tiêu chí (Ngân sách, Danh mục, Tối thiểu 3 món)
+    # Trường hợp gợi ý / lọc theo tiêu chí (Ngân sách, Danh mục, Số lượng)
     budget = int(max_budget or 0)
-    cat = (category or "all").strip().lower()
-    min_count = max(3, int(min_items or 3))
+    cat = (category or "all").strip()
+    min_count = max(1, int(min_items or 3))
 
     filtered_items = []
+    is_category_filtered = cat.lower() not in ["all", "tat ca", "tất cả", "menu", ""]
+
     for item in menu_db.values():
         # Lọc theo ngân sách nếu có
         if budget > 0 and item["price"] > budget:
             continue
-        
-        # Lọc theo danh mục nếu có
-        if cat not in ["all", "tất cả"]:
-            cat_lower = item["category"].lower()
-            if cat == "chay" and "chay" not in cat_lower:
-                continue
-            elif cat == "eat_clean" and "clean" not in cat_lower:
-                continue
-            elif cat == "tang_co" and "tăng cơ" not in cat_lower and "protein" not in cat_lower:
-                continue
-            elif cat == "hai_san" and "hải sản" not in cat_lower:
-                continue
-            elif cat == "keto" and "keto" not in cat_lower:
-                continue
+
+        # Lọc theo danh mục
+        if is_category_filtered and not match_menu_category(item, cat):
+            continue
 
         filtered_items.append({
             "set_code": item["set_code"],
@@ -236,8 +280,8 @@ def execute_query_food_set(
             "allergen_warning": item["allergen_warning"]
         })
 
-    # Nếu sau khi lọc có ít hơn 3 món (do điều kiện ngân sách quá gắt), nạp thêm các món có giá thấp nhất
-    if len(filtered_items) < min_count:
+    # Chỉ bù thêm món giá thấp khi KHÔNG lọc theo danh mục cụ thể (tránh gán món mặn vào danh mục chay)
+    if not is_category_filtered and len(filtered_items) < min_count:
         sorted_all = sorted(menu_db.values(), key=lambda x: x["price"])
         for item in sorted_all:
             if not any(f["set_code"] == item["set_code"] for f in filtered_items):
@@ -253,10 +297,12 @@ def execute_query_food_set(
             if len(filtered_items) >= min_count:
                 break
 
+    print(f"🗄️ [DB QUERY]: Quét data/menu.json (Bộ lọc: category='{cat}', max_budget={budget or 'N/A'}) ➔ Khớp {len(filtered_items)}/{len(menu_db)} món ăn")
+
     return json.dumps({
         "status": "SUCCESS",
         "total_results": len(filtered_items),
-        "recommended_meals": filtered_items[:max(min_count, len(filtered_items))]
+        "recommended_meals": filtered_items
     }, ensure_ascii=False)
 
 
